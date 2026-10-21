@@ -1,39 +1,98 @@
 "use strict";
-const $ = id => document.getElementById(id);
-const ZONES = [
- {id:"orbit",name:"Орбита Венеры",alt:"Орбитальный сегмент",desc:"Транспорт, ретрансляция данных и связь с Землёй.",risk:"Радиация и транспортные окна"},
- {id:"clouds",name:"Облачный слой",alt:"≈ 50–60 км",desc:"Целевая зона роботизированных аэростатов. Кислотные аэрозоли и мощные ветры требуют защиты.",risk:"Серная кислота и ветровая нагрузка"},
- {id:"lower",name:"Нижняя атмосфера",alt:"Ниже облаков",desc:"Высокая температура и давление. На первом этапе только дистанционное исследование.",risk:"Экстремальная среда"},
- {id:"surface",name:"Поверхность",alt:"≈ 92 бар · ≈ 465 °C",desc:"Долговременная работа оборудования здесь остаётся сложной исследовательской задачей.",risk:"Температура и давление"}
-];
-const PROJECTS=[
- {id:"archive",name:"Расшифровать архив",zone:"orbit",cost:{credits:16},desc:"Найти расчёты закрытой советской программы."},
- {id:"probe",name:"Атмосферный зонд",zone:"clouds",requires:["archive"],cost:{credits:24,science:6},desc:"Проверить условия для аэростатной платформы."},
- {id:"relay",name:"Орбитальный ретранслятор",zone:"orbit",requires:["archive"],cost:{credits:18,power:4},desc:"Поддержать передачу данных и снабжение."},
- {id:"aerostat",name:"Первый аэростат",zone:"clouds",requires:["probe","relay"],cost:{credits:44,science:12,supplies:12},desc:"Автономный демонстратор: энергия, связь, коррозия."},
- {id:"logistics",name:"Грузовая программа",zone:"orbit",requires:["relay"],cost:{credits:30,power:6},desc:"Открыть устойчивую доставку расходных материалов."},
- {id:"lab",name:"Облачная лаборатория",zone:"clouds",requires:["aerostat","logistics"],cost:{credits:36,science:15,supplies:10},desc:"Организовать длительные исследования в атмосфере."},
- {id:"descent",name:"Спускаемый аппарат",zone:"lower",requires:["probe"],cost:{credits:26,science:10},desc:"Исследовать нижние слои атмосферы."},
- {id:"lander",name:"Поверхностный модуль",zone:"surface",requires:["descent","relay"],cost:{credits:34,science:15},desc:"Кратковременная работа в экстремальной среде."}
-];
-function fresh(mode="campaign"){return {version:3,mode,turn:1,year:2034,credits:mode==="session"?175:120,science:mode==="session"?40:20,power:25,supplies:30,zone:"orbit",completed:[],international:false,storyStep:0,hazard:0,log:["Получен доступ к архиву венерианской программы."]};}
-let s=fresh();
-let flash="";
-const completed=id=>s.completed.includes(id);
-function notify(message){flash=message;}
-function log(message){s.log.unshift(s.year+" · "+message);s.log=s.log.slice(0,18);}
-function affordable(cost){return Object.entries(cost).every(([key,value])=>s[key]>=value);}
-function available(p){return !completed(p.id)&&(!p.requires||p.requires.every(completed));}
-function doProject(id){const p=PROJECTS.find(x=>x.id===id);if(!p||!available(p)||!affordable(p.cost))return notify("Недостаточно ресурсов или не завершены необходимые проекты."),render();for(const [key,value] of Object.entries(p.cost))s[key]-=value;s.completed.push(id);s.science+=p.id==="probe"?10:p.id==="descent"?12:0;log("Завершён проект «"+p.name+"».");if(p.id==="aerostat")log("Аэростат вышел на проектную высоту. Первые телеметрические данные получены.");if(p.id==="lab")log("Открыта исследовательская станция в облаках Венеры.");notify("Проект завершён: "+p.name);render();}
-function choices(){if(s.mode!=="campaign")return [{name:"Свободная сессия",desc:"Развивайте станции и проводите исследования без сюжетных требований.",disabled:true}];if(s.storyStep===0)return [{name:"Представить программу научному совету",desc:"Получить первые научные контакты.",action:()=>{s.storyStep=1;s.science+=8;log("Учёные согласились изучить архив, несмотря на репутационные риски.");}}];if(s.storyStep===1)return [{name:"Предложить международное сотрудничество",desc:"Потребуется завершить зонд и ретранслятор. +60 бюджета и +12 снабжения.",disabled:!(completed("probe")&&completed("relay")),action:()=>{s.storyStep=2;s.international=true;s.credits+=60;s.supplies+=12;log("Подписан предварительный международный исследовательский меморандум.");}}];return [{name:"Международная программа открыта",desc:"Исследовательские организации объединили усилия. Дальше — эксплуатация аэростатов.",disabled:true}];}
-function nextTurn(){s.turn++;s.year++;const gain=12+(s.international?8:0)+(completed("lab")?6:0);s.credits+=gain;s.science+=3+(completed("probe")?3:0)+(completed("lab")?8:0);s.power+=2+(completed("aerostat")?1:0);if(completed("logistics"))s.supplies+=7;else if(completed("aerostat"))s.supplies=Math.max(0,s.supplies-3);s.hazard=(s.turn*7+s.completed.length*3)%11;if(s.hazard>=9&&completed("aerostat")){s.supplies=Math.max(0,s.supplies-2);log("Сложная атмосферная обстановка: дополнительные затраты расходников.");}if(s.supplies===0&&completed("aerostat"))log("ВНИМАНИЕ: склад пуст, эксплуатация аэростата под угрозой.");log("Финансирование: +"+gain+". Научная программа продолжена.");notify("Перешли к "+s.year+" году.");render();}
-function setMode(mode){if(s.mode===mode)return;if(!confirm("Начать новую "+(mode==="campaign"?"кампанию":"сессию")+"? Несохранённый прогресс будет потерян."))return;s=fresh(mode);flash="Новая игра начата.";render();}
-function save(){try{localStorage.setItem("helios-venus-v3",JSON.stringify(s));notify("Игра сохранена на этом устройстве.");}catch{notify("Не удалось сохранить игру в браузере.");}render();}
-function load(){try{const d=JSON.parse(localStorage.getItem("helios-venus-v3"));if(d&&d.version===3&&Array.isArray(d.completed)&&ZONES.some(z=>z.id===d.zone))return d;}catch{}return fresh();}
-function drawZones(){const container=$("layers");container.replaceChildren(...ZONES.map(z=>{const b=document.createElement("button");b.className="layer "+(s.zone===z.id?"active":"");b.type="button";const left=document.createElement("span");left.innerHTML='<strong></strong><small></small>';left.querySelector("strong").textContent=z.name;left.querySelector("small").textContent=z.alt;const right=document.createElement("b");right.textContent=PROJECTS.filter(p=>p.zone===z.id&&completed(p.id)).length+"/"+PROJECTS.filter(p=>p.zone===z.id).length;b.append(left,right);b.onclick=()=>{s.zone=z.id;flash="";render();};return b;}));}
-function drawProjects(){const container=$("projects");container.replaceChildren(...PROJECTS.filter(p=>p.zone===s.zone).map(p=>{const card=document.createElement("div");card.className="project";const h=document.createElement("h4");h.textContent=p.name;const d=document.createElement("p");d.textContent=p.desc;const cost=document.createElement("small");cost.textContent=Object.entries(p.cost).map(([k,v])=>({credits:"₡",science:"⚗",power:"⚡",supplies:"▣"}[k]+v)).join(" · ");const btn=document.createElement("button");btn.textContent=completed(p.id)?"Завершено":available(p)?"Реализовать":"Требуются предыдущие проекты";btn.disabled=!available(p)||!affordable(p.cost);btn.onclick=()=>doProject(p.id);card.append(h,d,cost,btn);container.append(card);}));}
-function drawStory(){if(s.mode==="session"){$("chapter-title").textContent="Инженерная песочница";$("chapter-copy").textContent="У вас есть бюджет и доступ к проектированию. Проверьте, сможете ли вы создать устойчивую исследовательскую инфраструктуру Венеры.";}else if(s.storyStep===0){$("chapter-title").textContent="Секретный архив";$("chapter-copy").textContent="После распада СССР в закрытом фонде остались расчёты, которые никто не принимал всерьёз. Молодой инженер из России убеждён: эти идеи можно проверить современными средствами. Для коллег он мечтатель, для начальства — источник проблем.";}else if(s.storyStep===1){$("chapter-title").textContent="Граница невозможного";$("chapter-copy").textContent="Первый научный совет потребовал доказательств. Создайте атмосферный зонд и ретранслятор. Только после этого международные партнёры готовы обсуждать участие.";}else{$("chapter-title").textContent="Программа становится международной";$("chapter-copy").textContent="Первые договорённости подписаны. Теперь задача — построить аэростат, обеспечить снабжение и перейти от эффектного заявления к эксплуатации.";}
-$("story-actions").replaceChildren(...choices().map(c=>{const b=document.createElement("button");b.className="choice";b.disabled=!!c.disabled;b.textContent=c.name;const small=document.createElement("small");small.textContent=c.desc;b.append(small);if(c.action)b.onclick=()=>{c.action();notify("Сюжетная глава обновлена.");render();};return b;}));}
-function render(){const z=ZONES.find(x=>x.id===s.zone);$("year").textContent=s.year;$("credits").textContent=s.credits;$("science").textContent=s.science;$("power").textContent=s.power;$("supplies").textContent=s.supplies;$("sector-name").textContent=z.name;$("sector-copy").textContent=z.desc;$("sector-status").textContent="Опасности: "+z.risk;$("hazard").textContent=s.hazard>=9?"ПОВЫШЕНЫ":"КОНТРОЛИРУЮТСЯ";$("turn").textContent="ХОД "+s.turn;$("campaign").classList.toggle("selected",s.mode==="campaign");$("session").classList.toggle("selected",s.mode==="session");drawZones();drawProjects();drawStory();$("events").replaceChildren(...s.log.slice(0,6).map(t=>{const el=document.createElement("div");el.textContent=t;return el;}));$("message").textContent=flash;}
-$("next").onclick=nextTurn;$("save").onclick=save;$("reset").onclick=()=>{if(confirm("Начать заново?")){s=fresh(s.mode);flash="Новая игра начата.";render();}};$("campaign").onclick=()=>setMode("campaign");$("session").onclick=()=>setMode("session");
-s=load();render();
+const Engine=globalThis.HeliosVenus;
+const $=id=>document.getElementById(id);
+const labels={credits:"бюджет",science:"наука",energy:"энергия",supplies:"снабжение"};
+let game=Engine.restore(localStorage.getItem("helios-venus-v4"))||Engine.create();
+let feedback="";
+function listCost(cost){return Object.entries(cost).map(([k,v])=>v+" "+labels[k]).join(" · ");}
+function change(command){
+  const result=Engine.apply(game,command);
+  if(result.error){feedback=result.error;}else{game=result.state;feedback="Операция выполнена.";}
+  render();
+}
+function clear(n){n.replaceChildren();}
+function element(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
+function makeButton(label,callback,disabled=false,cls=""){const b=element("button",cls,label);b.type="button";b.disabled=disabled;b.addEventListener("click",callback);return b;}
+function drawZones(){
+ const root=$("layers");clear(root);
+ for(const z of Engine.ZONES){
+  const btn=element("button","layer"+(game.selected===z.id?" active":""));
+  const info=element("span");info.append(element("strong","",z.name),element("small","",z.alt));
+  const progress=element("b","",Engine.PROJECTS.filter(p=>p.zone===z.id&&Engine.has(game,p.id)).length+"/"+Engine.PROJECTS.filter(p=>p.zone===z.id).length);
+  btn.append(info,progress);btn.addEventListener("click",()=>change({type:"select",id:z.id}));root.append(btn);
+ }
+}
+function drawProjects(){
+ const root=$("projects");clear(root);
+ for(const project of Engine.PROJECTS.filter(p=>p.zone===game.selected)){
+  const card=element("div","project");
+  card.append(element("h4","",project.name),element("p","",project.description),element("small","",listCost(project.cost)));
+  const done=Engine.has(game,project.id);
+  const missing=project.requires.filter(x=>!Engine.has(game,x));
+  const label=done?"Завершено":missing.length?"Нужно: "+missing.map(x=>Engine.PROJECTS.find(p=>p.id===x)?.name||x).join(", "):"Реализовать";
+  card.append(makeButton(label,()=>change({type:"build",id:project.id}),!Engine.canBuild(game,project.id)));
+  root.append(card);
+ }
+ if(game.selected==="orbit"&&Engine.has(game,"logistics")){
+  const card=element("div","project");
+  card.append(element("h4","","Отправить снабжение с Земли"),element("p","","22 единицы через два хода. Перевозка стоит 16 бюджета и 3 энергии."));
+  card.append(makeButton("Заказать груз",()=>change({type:"shipment"}),game.credits<16||game.energy<3||game.finished));root.append(card);
+ }
+ if(game.selected==="clouds"&&Engine.has(game,"aerostat")){
+  const card=element("div","project");
+  card.append(element("h4","","Обслуживание аэростата"),element("p","","Состояние "+game.condition+"%. Ремонт: 12 бюджета и 7 снабжения (+35%)."));
+  card.append(makeButton("Провести ремонт",()=>change({type:"repair"}),game.condition>=100||game.credits<12||game.supplies<7||game.finished));root.append(card);
+ }
+}
+function drawStory(){
+ const title=$("chapter-title"),copy=$("chapter-copy"),actions=$("story-actions");clear(actions);
+ if(game.finished){
+  title.textContent="Облака стали домом";
+  copy.textContent="Три года непрерывных исследований доказали, что длительное присутствие на Венере возможно. Это начало истории, а не конец колонизации.";
+  actions.append(element("p","subtle","Прототип первой кампании завершён."));
+ }else if(game.mode==="session"){
+  title.textContent="Свободная венерианская сессия";
+  copy.textContent="Задача: построить облачную лабораторию и обеспечить три года устойчивой работы платформы. Снабжение доставляется с Земли по открытому маршруту.";
+  actions.append(element("p","subtle","История не ограничивает строительство, но инженерные требования сохраняются."));
+ }else if(game.storyStep===0){
+  title.textContent="Досье, которого не существовало";
+  copy.textContent="Молодой российский инженер достаёт забытый закрытый советский архив. Его считают одержимым, а план возродить Венеру — невозможным. В России нужно найти тех, кто даст идее шанс.";
+  actions.append(makeButton("Вынести расчёты на научный совет",()=>change({type:"council"}),false,"choice"));
+ }else if(game.storyStep===1){
+  title.textContent="Слишком смелый проект";
+  copy.textContent="Одного красноречия недостаточно. Продемонстрируйте атмосферный зонд и орбитальную связь. Только после этого внешние агентства и промышленность готовы обсуждать участие.";
+  const enabled=Engine.has(game,"probe")&&Engine.has(game,"relay");
+  actions.append(makeButton(enabled?"Открыть международную программу":"Сначала нужны зонд и ретранслятор",()=>change({type:"treaty"}),!enabled,"choice"));
+ }else{
+  title.textContent="Венера становится общей";
+  copy.textContent="Россия начинает программу, но эксплуатация Венеры требует кооперации исследователей и промышленности разных стран. Следующая цель: облачная лаборатория и три года надёжной работы.";
+  actions.append(element("p","subtle","Международное соглашение действует. +9 бюджета каждый год."));
+ }
+}
+function render(){
+ const zone=Engine.ZONES.find(z=>z.id===game.selected);
+ $("year").textContent=game.year;$("credits").textContent=game.credits;$("science").textContent=game.science;
+ $("power").textContent=game.energy;$("supplies").textContent=game.supplies;
+ $("sector-name").textContent=zone.name;$("sector-copy").textContent=zone.description;
+ $("sector-status").textContent="Риски: "+zone.hazard;
+ $("hazard").textContent=Engine.has(game,"aerostat")?"АЭРОСТАТ "+game.condition+"%":"НЕ ОЦЕНЕНЫ";
+ $("turn").textContent="ХОД "+game.turn;
+ $("campaign").classList.toggle("selected",game.mode==="campaign");
+ $("session").classList.toggle("selected",game.mode==="session");
+ $("next").disabled=game.finished;
+ $("next").querySelector("span").textContent=game.finished?"✓":"→";
+ drawZones();drawProjects();drawStory();
+ $("events").replaceChildren(...game.log.slice(0,9).map(x=>element("div","",x)));
+ $("message").textContent=feedback;
+}
+function switchMode(mode){
+ if(game.mode===mode)return;
+ if(!confirm("Начать новую "+(mode==="campaign"?"кампанию":"сессию")+"? Текущий прогресс будет потерян."))return;
+ game=Engine.create(mode);feedback="Начата новая игра.";render();
+}
+$("next").addEventListener("click",()=>change({type:"next"}));
+$("campaign").addEventListener("click",()=>switchMode("campaign"));
+$("session").addEventListener("click",()=>switchMode("session"));
+$("save").addEventListener("click",()=>{try{localStorage.setItem("helios-venus-v4",JSON.stringify(game));feedback="Прогресс сохранён на этом устройстве.";}catch{feedback="Браузер не разрешил сохранить игру.";}render();});
+$("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;game=Engine.create(game.mode);feedback="Начата новая игра.";render();});
+render();
