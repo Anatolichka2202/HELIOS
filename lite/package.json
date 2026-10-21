@@ -1,0 +1,1 @@
+{"name":"helios-lite","version":"0.2.1","private":true,"description":"Mobile-friendly browser prototype for HELIOS","scripts":{"check":"node --check game.js","start":"python3 -m http.server 8080"}}
