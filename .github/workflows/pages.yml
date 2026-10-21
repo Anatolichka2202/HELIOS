@@ -29,9 +29,13 @@ jobs:
           cd lite
           npm run check
           npm test
+      - name: Stage static game files
+        run: |
+          mkdir -p public
+          cp lite/index.html lite/style.css lite/engine.js lite/game.js public/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: lite
+          path: public
       - id: deployment
         uses: actions/deploy-pages@v4
