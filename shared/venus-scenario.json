@@ -1,0 +1,144 @@
+{
+  "title": "HELIOS: Venus Initiative",
+  "schemaVersion": 1,
+  "fictionDisclaimer": "The classified Soviet colony initiative is fictional alternate history, inspired by documented Venera missions.",
+  "scope": {
+    "initialPrototype": "Venus",
+    "franchise": "Solar System"
+  },
+  "time": {
+    "startingYear": 2034,
+    "turn": "abstract year"
+  },
+  "resources": {
+    "credits": "abstract funding units",
+    "science": "abstract research units",
+    "energy": "abstract power reserve units",
+    "supplies": "abstract consumables units"
+  },
+  "regions": [
+    {
+      "id": "orbit",
+      "name": "Venus orbit"
+    },
+    {
+      "id": "clouds",
+      "name": "Cloud deck, nominal 50–60 km"
+    },
+    {
+      "id": "lower",
+      "name": "Lower atmosphere"
+    },
+    {
+      "id": "surface",
+      "name": "Venus surface"
+    }
+  ],
+  "projects": [
+    {
+      "id": "archive",
+      "zone": "orbit",
+      "requires": [],
+      "cost": {
+        "credits": 12
+      }
+    },
+    {
+      "id": "probe",
+      "zone": "clouds",
+      "requires": [
+        "archive"
+      ],
+      "cost": {
+        "credits": 24,
+        "science": 6
+      }
+    },
+    {
+      "id": "relay",
+      "zone": "orbit",
+      "requires": [
+        "archive"
+      ],
+      "cost": {
+        "credits": 18,
+        "energy": 4
+      }
+    },
+    {
+      "id": "aerostat",
+      "zone": "clouds",
+      "requires": [
+        "probe",
+        "relay"
+      ],
+      "cost": {
+        "credits": 40,
+        "science": 12,
+        "supplies": 12
+      }
+    },
+    {
+      "id": "logistics",
+      "zone": "orbit",
+      "requires": [
+        "relay"
+      ],
+      "cost": {
+        "credits": 28,
+        "energy": 6
+      }
+    },
+    {
+      "id": "lab",
+      "zone": "clouds",
+      "requires": [
+        "aerostat",
+        "logistics"
+      ],
+      "cost": {
+        "credits": 34,
+        "science": 12,
+        "supplies": 6
+      }
+    },
+    {
+      "id": "descent",
+      "zone": "lower",
+      "requires": [
+        "probe"
+      ],
+      "cost": {
+        "credits": 25,
+        "science": 10
+      }
+    },
+    {
+      "id": "lander",
+      "zone": "surface",
+      "requires": [
+        "descent",
+        "relay"
+      ],
+      "cost": {
+        "credits": 32,
+        "science": 15
+      }
+    }
+  ],
+  "supply": {
+    "shippingCost": {
+      "credits": 16,
+      "energy": 3
+    },
+    "turnsToArrive": 2,
+    "shipmentUnits": 22,
+    "aerostatConsumptionPerTurn": 3,
+    "labConsumptionPerTurn": 5
+  },
+  "outcomes": {
+    "stableLaboratoryYearsRequired": 3,
+    "campaignRequiresInternationalAgreement": true
+  },
+  "confidence": "Illustrative game rules. Not physically accurate models of Venus atmosphere, supply windows or orbital mechanics."
+}
