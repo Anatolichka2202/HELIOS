@@ -1,0 +1,19 @@
+# Unreal
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+.vs/
+# Unity
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+UserSettings/
+# C++
+**/build/
+**/cmake-build-*/
+# OS
+.DS_Store
+Thumbs.db
