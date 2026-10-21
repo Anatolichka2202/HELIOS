@@ -2,7 +2,9 @@
 const Engine=globalThis.HeliosVenus;
 const $=id=>document.getElementById(id);
 const labels={credits:"бюджет",science:"наука",energy:"энергия",supplies:"снабжение"};
-let game=Engine.restore(localStorage.getItem("helios-venus-v4"))||Engine.create();
+let stored=null;
+try{stored=localStorage.getItem("helios-venus-v4");}catch{}
+let game=Engine.restore(stored)||Engine.create();
 let feedback="";
 function listCost(cost){return Object.entries(cost).map(([k,v])=>v+" "+labels[k]).join(" · ");}
 function change(command){
