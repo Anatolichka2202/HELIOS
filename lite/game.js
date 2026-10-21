@@ -16,7 +16,7 @@ const PROJECTS=[
  {id:"descent",name:"Спускаемый аппарат",zone:"lower",requires:["probe"],cost:{credits:26,science:10},desc:"Исследовать нижние слои атмосферы."},
  {id:"lander",name:"Поверхностный модуль",zone:"surface",requires:["descent","relay"],cost:{credits:34,science:15},desc:"Кратковременная работа в экстремальной среде."}
 ];
-function fresh(mode="campaign"){return {version:3,mode,turn:1,year:2034,credits:mode==="session"?175:120,science:mode==="session"?40:20,power:25,supplies:30,zone:"clouds",completed:[],international:false,storyStep:0,hazard:0,log:["Получен доступ к архиву венерианской программы."]};}
+function fresh(mode="campaign"){return {version:3,mode,turn:1,year:2034,credits:mode==="session"?175:120,science:mode==="session"?40:20,power:25,supplies:30,zone:"orbit",completed:[],international:false,storyStep:0,hazard:0,log:["Получен доступ к архиву венерианской программы."]};}
 let s=fresh();
 let flash="";
 const completed=id=>s.completed.includes(id);
