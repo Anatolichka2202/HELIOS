@@ -1,0 +1,23 @@
+name: Prototype checks
+on:
+  push:
+  pull_request:
+jobs:
+  lite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Lite JavaScript syntax
+        run: node --check lite/game.js
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test C++ core
+        run: |
+          cmake -S core -B /tmp/helios-core-build -DCMAKE_BUILD_TYPE=Debug
+          cmake --build /tmp/helios-core-build --parallel
+          ctest --test-dir /tmp/helios-core-build --output-on-failure
