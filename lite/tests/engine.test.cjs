@@ -261,3 +261,17 @@ test("corrosion breakthrough costs resources and increases long-term score",()=>
  assert.ok(upgraded.state.prototype);
  assert.equal(E.score(upgraded.state)-E.score(s),25-18-40);
 });
+
+test("station cannot claim stable laboratory years without real supplies or power",()=>{
+ let s=campaignToBase();
+ s={...s,supplies:0,energy:0,condition:100,consecutiveYears:2,finished:false};
+ const scienceBefore=s.science;
+ const result=move(s,"next");
+ assert.equal(result.error,null);
+ assert.equal(result.state.consecutiveYears,0);
+ assert.equal(result.state.outcome,null);
+ assert.equal(result.state.finished,false);
+ assert.equal(result.state.science-scienceBefore,8); // 3 base + 2 probe + 3 public exchange
+ assert.equal(result.state.lastTurn.operating,false);
+ assert.equal(E.forecast(s).shortage,true);
+});
