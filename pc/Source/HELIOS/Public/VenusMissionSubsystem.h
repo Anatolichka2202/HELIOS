@@ -65,7 +65,7 @@ struct FVenusMissionState
     FName Funding = NAME_None;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="HELIOS|Mission")
-    FName Policy = TEXT("standard");
+    FName Policy = FName(TEXT("standard"));
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="HELIOS|Mission")
     FName Outcome = NAME_None;
