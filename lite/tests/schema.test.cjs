@@ -31,7 +31,7 @@ test("logistics two-turn contract agrees with the engine",()=>{
 });
 
 test("political funding choices reproduce the documented resource deltas",()=>{
-  assert.equal(spec.schemaVersion,2);
+  assert.equal(spec.schemaVersion,4);
   const c=E.apply(E.create(),{type:"council"}).state;
   for(const key of ["public","private"]){
     const r=E.apply(c,{type:"funding",id:key});
