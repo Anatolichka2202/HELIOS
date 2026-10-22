@@ -66,8 +66,8 @@ void AVenusPrototypeActor::RefreshVisualState()
     if (!Mission) return;
 
     const FVenusMissionState Snapshot = Mission->GetState();
-    const bool bAerostat = Snapshot.CompletedProjects.Contains(TEXT("aerostat"));
-    const bool bRelay = Snapshot.CompletedProjects.Contains(TEXT("relay"));
+    const bool bAerostat = Snapshot.CompletedProjects.Contains(FName(TEXT("aerostat")));
+    const bool bRelay = Snapshot.CompletedProjects.Contains(FName(TEXT("relay")));
 
     Aerostat->SetVisibility(bAerostat, true);
     Relay->SetVisibility(bRelay, true);
