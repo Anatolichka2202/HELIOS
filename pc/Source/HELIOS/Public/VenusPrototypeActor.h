@@ -39,4 +39,8 @@ public:
 
 protected:
     virtual void OnConstruction(const FTransform& Transform) override;
+    virtual void BeginPlay() override;
+
+    UFUNCTION()
+    void RefreshVisualState();
 };
