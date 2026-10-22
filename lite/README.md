@@ -24,9 +24,8 @@ Open http://localhost:8080. No backend or bundler required.
 
 ## Publish for iPhone
 
-[Pages deployment workflow](../.github/workflows/pages.yml) packages only `index.html`, `style.css`, `engine.js`, `game.js`.
-Enable this repository's **Settings → Pages → Source: GitHub Actions**, then run the workflow on `main`.
-This is not a live public URL until deployment succeeds.
+[Pages deployment workflow](../.github/workflows/pages.yml) packages the game runtime, its franchise configuration, styles, PWA files and assets.
+The repo currently also supports **Settings → Pages → Source: Deploy from a branch → main → /(root)**, using the top-level redirect to `/lite/index.html`. Do **not** use both deployment configurations simultaneously. Deployment was first confirmed via GitHub Pages; after each update check Actions and reload the published URL.
 
 ## Limitations
 
@@ -54,7 +53,7 @@ See [Venus vertical slice](../design/VENUS_VERTICAL_SLICE.md), [campaign](../des
 - Sandbox difficulty presets: **standard / resource-constrained / well-funded**.
 - Automatic local save; backup **export/import JSON** for transferring a game between browsers.
 - PWA install metadata and service-worker shell caching (HTTPS; device verification pending).
-- 61 regression/contract/UI checks passed in an isolated JS execution environment; GitHub Actions success still requires checking its dashboard.
+- 66 regression/contract/UI and commerce checks passed in an isolated JS execution environment; GitHub Actions success still requires checking its dashboard.
 - Runtime assets and project-ID contract checks are part of CI.
 
 **To play locally:** `cd lite && npm run check && npm test && python3 -m http.server 8080`. To play from iPhone, deploy using `.github/workflows/pages.yml` after enabling GitHub Pages.
@@ -71,3 +70,23 @@ See [Venus vertical slice](../design/VENUS_VERTICAL_SLICE.md), [campaign](../des
 - See [0.7 playtest guide](../docs/PLAYTEST_VENUS_0_7.md); native Unreal/Unity prototype rules have not yet adopted these changes.
 
 **Caution:** the game's mechanical periods are abstract and the science/engineering coefficients are uncalibrated. We have not measured real user retention or verified the browser build on physical iPhone Safari.
+
+## Franchise and monetization architecture (October 2026)
+
+**Lite is intended to be a standalone revenue-generating game**, not merely a free PC demo. The web UI now has a non-interruptive three-product showcase explaining differences between Lite (classified scientific expedition), Mobile (operating cloud stations) and PC (full Solar System civilization strategy). A link to this information is shown after a finished mission. The engineering simulation and free current scenario have **no paywall or advertising interruptions**.
+
+The storefront/source of truth is `ecosystem.js`. It includes two deliberately disabled offers: `support` (voluntary payment) and `paidEpisodes` (additional self-contained Lite stories). No payout account, hosted checkout or purchasable game is currently configured: **the web game cannot accept money yet**. Mobile and PC shop URLs are also absent, so false «buy now» buttons are not displayed.
+
+When a verified publisher-controlled HTTPS checkout/store page actually exists, update only the relevant offer and confirm any provider's commercial terms, local tax/consumer rules and customer support. Do not set `enabled:true` without manually verifying payments and refunds; do not collect card data in this static app. See [franchise strategy v0.4](../design/11_FRANCHISE_PRODUCT_STRATEGY.md).
+
+The artwork is no longer constrained to static 2D: lightweight atmospheric CSS motion is present, and WebGL/2.5D/3D may be used selectively once physically tested for FPS, load time, accessibility and battery on iPhone/Android. Current animations respect `prefers-reduced-motion`.
+
+To verify:
+```sh
+cd lite
+npm run check
+npm test
+python3 ../tools/verify_web_assets.py
+```
+
+The simulation and UI suite (including safe storefront checks) had **66 passing checks in a controlled JS harness** at the time of the v0.4 product-strategy update. This does not certify a real purchase, runtime FPS or native client build.
