@@ -11,7 +11,7 @@ const code = ["engine.js", "game.js"].map(name => fs.readFileSync(path.join(root
 const expectedIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
 class Element {
   constructor(tag="div") {
-    this.tagName=tag; this.children=[]; this.textContent=""; this.disabled=false;this.events={};
+    this.tagName=tag; this.children=[]; this.textContent=""; this.disabled=false;this.events={};this.style={};
     this.classList={toggle:()=>{},add:()=>{},remove:()=>{}};
   }
   append(...children){this.children.push(...children);}
@@ -84,4 +84,22 @@ test("objective guides the first campaign step and then sector work",()=>{
  assert.equal(app.get("objective-title").textContent,"Отправить атмосферный зонд");
  app.get("focus-goal").click();
  assert.equal(app.get("sector-name").textContent,"Облачный слой");
+});
+
+test("operations panel shows forecast and future shipment timeline",()=>{
+ const app=mount();
+ assert.equal(app.get("scene-stage").textContent,"ПОДГОТОВКА");
+ assert.equal(app.get("forecast-year").textContent,2035);
+ assert.equal(app.get("policy-buttons").children.length,3);
+ assert.equal(app.get("condition").textContent,"Не построен");
+});
+test("operations panel responds to progression without browser-only APIs",()=>{
+ const app=mount();
+ app.get("story-actions").children[0].click();
+ app.get("story-actions").children[0].click();
+ app.get("projects").children[0].children.at(-1).click();
+ app.get("focus-goal").click();
+ app.get("projects").children[0].children.at(-1).click();
+ assert.equal(app.get("scene-stage").textContent,"ИССЛЕДОВАНИЯ");
+ assert.ok(app.get("scene-caption").textContent.includes("Зонд"));
 });
