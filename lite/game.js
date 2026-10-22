@@ -83,6 +83,38 @@ function drawStory(){
   actions.append(element("p","subtle","Международное соглашение действует. +9 бюджета каждый год."));
  }
 }
+function nextObjective(){
+ if(game.finished)return {title:game.outcome==="failure"?"Миссия сорвана":"Первая экспедиция завершена",description:"Откройте новую партию, чтобы попробовать другой путь.",zone:null};
+ if(game.mode==="campaign"&&game.storyStep===0)return {title:"Доказать возможность проекта",description:"Вынесите расчёты на российский научный совет.",zone:null};
+ if(game.mode==="campaign"&&game.storyStep===1&&game.funding===null)return {title:"Выбрать финансирование",description:"Государственная открытая наука или частные инвесторы — решение повлияет на международные переговоры.",zone:null};
+ const required=[
+ ["archive","Изучить секретный архив","Восстановите исходные советские расчёты."],
+ ["probe","Отправить атмосферный зонд","Найдите рабочие условия в облачном слое."],
+ ["relay","Создать орбитальную связь","Без ретранслятора постоянная станция не получает надёжную связь."]
+ ];
+ for(const [id,title,description] of required){
+  if(!Engine.has(game,id))return {title,description,zone:Engine.PROJECTS.find(p=>p.id===id).zone};
+ }
+ if(game.mode==="campaign"&&game.storyStep===1)return {title:"Открыть международную программу",description:"Покажите результаты исследований партнёрам и согласуйте совместную миссию.",zone:null};
+ const expansion=[
+  ["aerostat","Развернуть первый аэростат","Проверьте научный демонстратор в облаках Венеры."],
+  ["logistics","Организовать грузовые рейсы","Грузы с Земли приходят через два года условного игрового времени."],
+  ["lab","Построить облачную лабораторию","Научная станция должна работать несмотря на износ."]
+ ];
+ for(const [id,title,description] of expansion){
+  if(!Engine.has(game,id))return {title,description,zone:Engine.PROJECTS.find(p=>p.id===id).zone};
+ }
+ if(game.condition<60)return {title:"Восстановить платформу",description:"Состояние аэростата ниже 60%: проведите ремонт.",zone:"clouds"};
+ if(game.supplies<8)return {title:"Заказать снабжение",description:"Резерв расходников истощается. Отправьте груз с Земли до следующей аварии.",zone:"orbit"};
+ return {title:"Обеспечить три года устойчивой работы",description:"Успешных лет: "+game.consecutiveYears+" из 3. Контролируйте состояние, энергию и расходники.",zone:null};
+}
+function drawObjective(){
+ const goal=nextObjective();
+ $("objective-title").textContent=goal.title;
+ $("objective-copy").textContent=goal.description;
+ $("focus-goal").textContent=goal.zone?"Перейти к сектору →":"Перейти к решению ↓";
+ $("focus-goal").disabled=game.finished;
+}
 function render(){
  const zone=Engine.ZONES.find(z=>z.id===game.selected);
  $("year").textContent=game.year;$("credits").textContent=game.credits;$("science").textContent=game.science;
@@ -95,7 +127,7 @@ function render(){
  $("session").classList.toggle("selected",game.mode==="session");
  $("next").disabled=game.finished;
  $("next").querySelector("span").textContent=game.finished?"✓":"→";
- drawZones();drawProjects();drawStory();
+ drawZones();drawProjects();drawStory();drawObjective();
  $("events").replaceChildren(...game.log.slice(0,9).map(x=>element("div","",x)));
  $("message").textContent=feedback;
 }
@@ -105,6 +137,11 @@ function switchMode(mode){
  game=Engine.create(mode);persist();feedback="Начата новая игра.";render();
 }
 $("next").addEventListener("click",()=>change({type:"next"}));
+$("focus-goal").addEventListener("click",()=>{
+ const goal=nextObjective();
+ if(goal.zone)change({type:"select",id:goal.zone});
+ else $("story-actions").scrollIntoView?.({behavior:"smooth",block:"center"});
+});
 $("campaign").addEventListener("click",()=>switchMode("campaign"));
 $("session").addEventListener("click",()=>switchMode("session"));
 $("save").addEventListener("click",()=>{feedback=persist()?"Прогресс сохранён на этом устройстве.":"Браузер не разрешил сохранить игру.";render();});
