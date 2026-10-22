@@ -80,7 +80,7 @@ test("objective guides the first campaign step and then sector work",()=>{
  assert.equal(app.get("objective-title").textContent,"Выбрать финансирование");
  app.get("story-actions").children[0].click();
  assert.equal(app.get("objective-title").textContent,"Изучить секретный архив");
- app.get("projects").children[0].click();
+ app.get("projects").children[0].children.at(-1).click();
  assert.equal(app.get("objective-title").textContent,"Отправить атмосферный зонд");
  app.get("focus-goal").click();
  assert.equal(app.get("sector-name").textContent,"Облачный слой");
