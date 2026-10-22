@@ -17,6 +17,8 @@ jobs:
           npm test
       - name: Verify static game assets
         run: python3 tools/verify_web_assets.py
+      - name: Verify cross-platform source contracts
+        run: python3 tools/verify_native_contracts.py
   core:
     runs-on: ubuntu-latest
     strategy:
