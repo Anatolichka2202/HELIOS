@@ -108,17 +108,25 @@ function restore(json){try{const s=JSON.parse(json);if(!s||s.version!==4||!["cam
  if(![null,"public","private"].includes(s.funding)||!Number.isInteger(s.criticalYears)||s.criticalYears<0||!POLICIES[s.policy]||!SESSION_PRESETS[s.preset])return null;
  return s;}catch{return null;}}
 function forecast(s){
- const policy=(has(s,"lab")?POLICIES[s.policy||"standard"]:null);
- const hasStation=has(s,"aerostat");
+ const station=has(s,"aerostat");
+ const policy=has(s,"lab")?(POLICIES[s.policy||"standard"]||POLICIES.standard):null;
+ const incoming=(s.shipments||[]).filter(load=>load.arrival<=s.turn+1).reduce((n,load)=>n+load.amount,0);
+ const maintenance=station?(policy?policy.supplies:3):0;
+ const power=station?(policy?policy.energy:2):0;
+ const wear=station?(policy?policy.wear:4):0;
+ const stocked=!station||(s.supplies+incoming>=maintenance&&s.energy+3>=power);
+ const nextCondition=station?Math.max(0,s.condition-(stocked?wear:22)):null;
+ const labScience=has(s,"lab")&&nextCondition>=40?(policy||POLICIES.standard).science:0;
  return {
   nextYear:s.year+1,
   credits:13+(s.international?9:0),
-  science:3+(has(s,"probe")?2:0)+(has(s,"lab")&&s.condition>=40?(policy||POLICIES.standard).science:0),
-  energy:3-(hasStation?(policy?policy.energy:2):0),
-  supplies:(s.shipments||[]).filter(load=>load.arrival<=s.turn+1).reduce((n,load)=>n+load.amount,0)-(hasStation?(policy?policy.supplies:3):0),
-  incoming:(s.shipments||[]).filter(load=>load.arrival<=s.turn+1).reduce((n,load)=>n+load.amount,0),
-  maintenance:hasStation?(policy?policy.supplies:3):0,
-  predictedCondition:hasStation?Math.max(0,s.condition-(policy?policy.wear:4)):null,
+  science:3+(has(s,"probe")?2:0)+labScience,
+  energy:3-(station&&stocked?power:0),
+  supplies:incoming-(station&&stocked?maintenance:0),
+  incoming,
+  maintenance,
+  predictedCondition:nextCondition,
+  shortage:!stocked,
   stormRisk:"Возможны дополнительные потери при атмосферном событии."
  };
 }
