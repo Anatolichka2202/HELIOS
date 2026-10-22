@@ -47,7 +47,7 @@ function create(mode="campaign",preset="standard"){
   credits:mode==="session"?starting.credits:125,science:mode==="session"?starting.science:20,
   energy:mode==="session"?starting.energy:25,supplies:mode==="session"?starting.supplies:32,
   selected:"orbit",completed:[],shipments:[],condition:0,consecutiveYears:0,international:false,
-  storyStep:0,funding:null,criticalYears:0,outcome:null,policy:"standard",design:null,buildQueue:[],event:null,eventResolved:false,insight:null,lastTurn:null,finished:false,
+  storyStep:0,funding:null,criticalYears:0,outcome:null,policy:"standard",design:null,buildQueue:[],event:null,eventResolved:false,insight:null,prototype:false,lastTurn:null,finished:false,
   log:["2034 · В России обнаружен архив закрытой венерианской программы."]};
 }
 function copy(s){return {...s,completed:[...s.completed],shipments:s.shipments.map(x=>({...x})),
@@ -93,6 +93,15 @@ case "design":{
     return {state:s,error:"Для выбора конструкции сначала нужны зонд и ретранслятор."};
  n.design=command.id;
  addLog(n,"Инженерное решение: "+DESIGNS[n.design].name+".");
+ break;
+}
+case "prototype":{
+ if(n.insight!=="sample"||!has(n,"lab")||n.prototype)
+   return {state:s,error:"Технология кислотостойкой оболочки ещё не исследована."};
+ if(n.credits<18||n.science<20||n.supplies<4)
+   return {state:s,error:"Для технологии нужно 18 бюджета, 20 науки и 4 расходника."};
+ n.credits-=18;n.science-=20;n.supplies-=4;n.prototype=true;
+ addLog(n,"Прототип кислотостойкой оболочки готов. Износ снижен на 3, ущерб штормов на 4.");
  break;
 }
 case "respond":{
@@ -152,11 +161,11 @@ if(hadAerostat){
  const power=policy?policy.energy:2;
  const stocked=n.supplies>=maintenance&&n.energy>=power;
  if(stocked){n.supplies-=maintenance;n.energy-=power;
-  const wear=Math.max(1,(policy?policy.wear:4)+(DESIGNS[n.design]?.wear||0));
+  const wear=Math.max(1,(policy?policy.wear:4)+(DESIGNS[n.design]?.wear||0)-(n.prototype?3:0));
   n.condition=Math.max(0,n.condition-wear);}
  else {n.condition=Math.max(0,n.condition-22);addLog(n,"Недостаток энергии или снабжения: ускоренный износ платформы.");}
 const storm=(n.turn*7+3)%13>=10;if(storm){
- const stormDamage=Math.max(1,13+(DESIGNS[n.design]?.storm||0)-(n.insight==="protect"?5:0));
+ const stormDamage=Math.max(1,13+(DESIGNS[n.design]?.storm||0)-(n.insight==="protect"?5:0)-(n.prototype?4:0));
  n.condition=Math.max(0,n.condition-stormDamage);
  addLog(n,"Кислотный шторм: −"+stormDamage+" состояния. Конструкция и защита влияют на ущерб.");
 }if(n.condition===0){n.criticalYears++;addLog(n,"Аэростат выведен из эксплуатации: ещё один год простоя сорвёт миссию.");}
@@ -196,9 +205,10 @@ function restore(json){try{const s=JSON.parse(json);if(!s||s.version!==4||!["cam
  if(s.event===undefined)s.event=null;
  if(s.eventResolved===undefined)s.eventResolved=false;
  if(s.insight===undefined)s.insight=null;
+ if(s.prototype===undefined)s.prototype=false;
  if(!Array.isArray(s.buildQueue)||s.buildQueue.some(q=>!SCHEDULED[q.id]||
     !Number.isInteger(q.ready)||q.ready<s.turn||s.completed.includes(q.id)))return null;
- if(![null,"shield","light","legacy"].includes(s.design)||
+ if(typeof s.prototype!=="boolean"||![null,"shield","light","legacy"].includes(s.design)||
     ![null,"acid-front"].includes(s.event)||
     ![null,"sample","protect","retreat"].includes(s.insight))return null;
  if(![null,"public","private"].includes(s.funding)||!Number.isInteger(s.criticalYears)||s.criticalYears<0||!POLICIES[s.policy]||!SESSION_PRESETS[s.preset])return null;
@@ -209,7 +219,7 @@ function forecast(s){
  const cost=active?(policy?policy.supplies:3):0;
  const power=active?(policy?policy.energy:2):0;
  const stocked=!active||s.supplies+arriving>=cost&&s.energy+3>=power;
- const wear=Math.max(1,(policy?policy.wear:4)+(DESIGNS[s.design]?.wear||0));
+ const wear=Math.max(1,(policy?policy.wear:4)+(DESIGNS[s.design]?.wear||0)-(s.prototype?3:0));
  return {
  nextYear:s.year+1,
  credits:13+(s.international?9:0)-(s.funding==="private"&&lab?6:0),
@@ -225,7 +235,7 @@ function forecast(s){
 function score(s){
  return Math.max(0,Math.round(
    (s.outcome==="victory"?300:0)
-   +s.completed.length*25
+   +s.completed.length*25+(s.prototype?25:0)
    +s.science*2
    +Math.max(0,s.condition)
    +s.credits
