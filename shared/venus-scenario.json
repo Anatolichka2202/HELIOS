@@ -1,6 +1,6 @@
 {
   "title": "HELIOS: Venus Initiative",
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "fictionDisclaimer": "The classified Soviet colony initiative is fictional alternate history, inspired by documented Venera missions.",
   "scope": {
     "initialPrototype": "Venus",
@@ -198,5 +198,25 @@
       "restoredCondition": 35
     },
     "stepIntervalNote": "Currently one abstract game year; not a validated Earth–Venus flight time."
+  },
+  "sessionPresets": {
+    "standard": {
+      "credits": 170,
+      "science": 36,
+      "energy": 25,
+      "supplies": 32
+    },
+    "constrained": {
+      "credits": 120,
+      "science": 26,
+      "energy": 20,
+      "supplies": 20
+    },
+    "funded": {
+      "credits": 250,
+      "science": 60,
+      "energy": 40,
+      "supplies": 55
+    }
   }
 }
