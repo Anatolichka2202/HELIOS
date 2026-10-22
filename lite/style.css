@@ -130,3 +130,23 @@ header{flex-wrap:wrap}
  .ecosystem-card p{max-width:600px}.ecosystem-showcase{padding:20px}}
 @media(max-width:420px){.ecosystem-showcase{margin:25px 0 14px;padding:16px}.ecosystem-card{padding:15px}
  .ecosystem-card h3{font-size:19px}.ecosystem-lead p{font-size:13px}}
+
+/* Lightweight atmospheric life in the Lite game, without mandatory WebGL. */
+.illustrated-stage:before{
+  content:"";position:absolute;inset:-15%;z-index:0;pointer-events:none;opacity:.21;
+  background:repeating-linear-gradient(164deg,transparent 0 31px,#f4bd8444 31px 45px,transparent 45px 95px);
+  transform:translate3d(0,0,0);animation:helios-cloud-current 33s linear infinite;
+}
+.illustrated-stage:not(.crisis) .stage-object.active{will-change:transform}
+#visual-aerostat.active:not(.building){transform-box:fill-box;transform-origin:50% 50%;animation:helios-buoyant 5.7s ease-in-out infinite}
+#visual-relay.active{transform-box:fill-box;transform-origin:50% 50%;animation:helios-orbit 11s ease-in-out infinite}
+#visual-lab.active{filter:drop-shadow(0 0 8px #89d6d099)}
+.hero-visual{animation:helios-planet-breathe 15s ease-in-out infinite}
+@keyframes helios-cloud-current{to{transform:translate3d(6%,2%,0)}}
+@keyframes helios-buoyant{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes helios-orbit{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@keyframes helios-planet-breathe{0%,100%{opacity:1}50%{opacity:.84}}
+@media(prefers-reduced-motion:reduce){
+ .illustrated-stage:before,#visual-aerostat.active:not(.building),#visual-relay.active,.hero-visual{animation:none}
+ .illustrated-stage:not(.crisis) .stage-object.active{will-change:auto}
+}
