@@ -7,7 +7,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const code = ["engine.js", "game.js"].map(name => fs.readFileSync(path.join(root, name), "utf8"));
+const code = ["engine.js", "ecosystem.js", "game.js"].map(name => fs.readFileSync(path.join(root, name), "utf8"));
 const expectedIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
 class Element {
   constructor(tag="div") {
@@ -38,6 +38,7 @@ function mount(store=new Map(),allowedStorage=true){
  vm.createContext(sandbox);
  vm.runInContext(code[0],sandbox);
  vm.runInContext(code[1],sandbox);
+ vm.runInContext(code[2],sandbox);
  return {nodes,store,sandbox,get:id=>document.getElementById(id)};
 }
 test("game loads with four Venus zones and campaign story",()=>{
@@ -196,4 +197,26 @@ test("acid front is visible and next year is blocked until a crisis choice",()=>
  assert.equal(app.get("next").disabled,true);
  app.get("decision-options").children[1].click(); // reinforce, if enough supplies
  assert.equal(app.get("next").disabled,false);
+});
+
+test("franchise cards are distinguishable and contain no invented shop links",()=>{
+ const app=mount();
+ const products=app.get("ecosystem-products").children;
+ assert.equal(products.length,3);
+ assert.ok(products[0].children[1].textContent.includes("Досье"));
+ assert.ok(products[1].children[1].textContent.includes("Облачная"));
+ assert.ok(products[2].children[1].textContent.includes("Большая"));
+ for(const product of products){
+   assert.equal(product.children.some(child=>child.tagName==="a"),false);
+ }
+ assert.equal(app.get("ecosystem-offers").hidden,true);
+});
+test("browser holds independent campaign state when ecosystem display is rendered",()=>{
+ const app=mount();
+ assert.equal(app.get("year").textContent,2034);
+ assert.equal(app.get("layers").children.length,4);
+ assert.equal(app.get("ecosystem-products").children.length,3);
+ app.get("next").click();
+ assert.equal(app.get("year").textContent,2035);
+ assert.equal(app.get("ecosystem-products").children.length,3);
 });
