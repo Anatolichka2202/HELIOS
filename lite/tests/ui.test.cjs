@@ -103,3 +103,39 @@ test("operations panel responds to progression without browser-only APIs",()=>{
  assert.equal(app.get("scene-stage").textContent,"ИССЛЕДОВАНИЯ");
  assert.ok(app.get("scene-caption").textContent.includes("Зонд"));
 });
+
+test("policy selector becomes available after aerostat construction",()=>{
+ const app=mount();
+ const clickFirstProject=()=>app.get("projects").children[0].children.at(-1).click();
+ app.get("story-actions").children[0].click(); // scientific council
+ app.get("story-actions").children[0].click(); // public funding
+ clickFirstProject(); // archive
+ app.get("layers").children[1].click();
+ clickFirstProject(); // probe
+ app.get("layers").children[0].click();
+ app.get("projects").children[1].children.at(-1).click(); // relay
+ app.get("story-actions").children[0].click(); // treaty
+ app.get("layers").children[1].click();
+ app.get("projects").children[1].children.at(-1).click(); // aerostat
+ assert.equal(app.get("scene-stage").textContent,"АЭРОСТАТ");
+ assert.equal(app.get("policy-buttons").children[2].disabled,false);
+ app.get("policy-buttons").children[2].click();
+ const saved=JSON.parse(app.store.get("helios-venus-v4"));
+ assert.equal(saved.policy,"intensive");
+});
+test("compatible save file can be imported while invalid JSON is refused",async()=>{
+ const app=mount();
+ const initial=app.store.get("helios-venus-v4");
+ app.get("next").click();
+ const year=app.get("year").textContent;
+ assert.equal(year,2035);
+ const valid=JSON.stringify(app.sandbox.HeliosVenus.create());
+ const field=app.get("import-file");
+ const good={files:[{size:valid.length,text:async()=>valid}],value:""};
+ await field.events.change({target:good});
+ assert.equal(app.get("year").textContent,2034);
+ const bad={files:[{size:20,text:async()=>"{bad"}],value:""};
+ await field.events.change({target:bad});
+ assert.equal(app.get("year").textContent,2034);
+ assert.ok(app.get("message").textContent.includes("несовместимым"));
+});
