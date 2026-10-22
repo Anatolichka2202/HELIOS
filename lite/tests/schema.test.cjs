@@ -46,7 +46,7 @@ test("mission failure requires documented number of critical years",()=>{
 });
 
 test("operation policies share the same values as the game engine",()=>{
- assert.equal(spec.schemaVersion,3);
+ assert.equal(spec.schemaVersion,4);
  assert.equal(spec.operations.defaultPolicy,"standard");
  for(const key of ["conserve","standard","intensive"]){
    const engine=E.POLICIES[key];
@@ -64,4 +64,12 @@ test("maintenance and transport cost definitions stay consistent",()=>{
  assert.equal(spec.operations.repair.restoredCondition,35);
  assert.equal(spec.supply.turnsToArrive,2);
  assert.equal(state.policy,spec.operations.defaultPolicy);
+});
+
+test("session preset starting resources match shared contract",()=>{
+ const fields=["credits","science","energy","supplies"];
+ for(const id of ["standard","constrained","funded"]){
+   const state=E.create("session",id);
+   for(const field of fields)assert.equal(state[field],spec.sessionPresets[id][field]);
+ }
 });
