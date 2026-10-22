@@ -1,4 +1,4 @@
-# HELIOS Lite — Venus Initiative (0.5)
+# HELIOS Lite — Venus Initiative (0.6)
 
 The first playable vertical slice is **Venus**. The planned franchise remains Solar System-wide.
 
@@ -20,7 +20,7 @@ Open http://localhost:8080. No backend or bundler required.
 - Four Venus operating zones, eight prerequisite-driven engineering projects.
 - Delayed Earth–Venus shipments (two turns), consumption and repair of aerostat, simplified atmospheric hazard.
 - Annual budget/research and clear victory condition: three stable years of an operating cloud laboratory.
-- Versioned, validated browser saves; unit tests and JSON data-contract checks (16 tests total).
+- Versioned, validated browser saves; unit tests and JSON data-contract checks (regression-tested).
 
 ## Publish for iPhone
 
@@ -45,3 +45,16 @@ See [Venus vertical slice](../design/VENUS_VERTICAL_SLICE.md), [campaign](../des
 - Step-by-step actionable mission objective for new players.
 - Original Venus/aerostat SVG art tracked in this repository.
 - UI smoke tests, scenario-contract checks, and GitHub Actions build gates.
+
+## New in 0.6
+
+- Player-chosen operating policies: **conserve / standard / intensive** change science, power usage, supply costs and aerostat wear.
+- Live SVG mission diagram: probe, relay, aerostat and cloud laboratory unlock as construction progresses; damage affects appearance.
+- Supply timeline, station condition, next-period resource forecast and end-of-session score.
+- Sandbox difficulty presets: **standard / resource-constrained / well-funded**.
+- Automatic local save; backup **export/import JSON** for transferring a game between browsers.
+- PWA install metadata and service-worker shell caching (HTTPS; device verification pending).
+- 43 regression/contract/UI checks passed in an isolated JS execution environment; GitHub Actions success still requires checking its dashboard.
+- Runtime assets and project-ID contract checks are part of CI.
+
+**To play locally:** `cd lite && npm run check && npm test && python3 -m http.server 8080`. To play from iPhone, deploy using `.github/workflows/pages.yml` after enabling GitHub Pages.
