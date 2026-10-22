@@ -72,3 +72,16 @@ test("game renders even when storage is unavailable",()=>{
  app.get("next").click();
  assert.equal(app.get("year").textContent,2035);
 });
+
+test("objective guides the first campaign step and then sector work",()=>{
+ const app=mount();
+ assert.equal(app.get("objective-title").textContent,"Доказать возможность проекта");
+ app.get("story-actions").children[0].click();
+ assert.equal(app.get("objective-title").textContent,"Выбрать финансирование");
+ app.get("story-actions").children[0].click();
+ assert.equal(app.get("objective-title").textContent,"Изучить секретный архив");
+ app.get("projects").children[0].click();
+ assert.equal(app.get("objective-title").textContent,"Отправить атмосферный зонд");
+ app.get("focus-goal").click();
+ assert.equal(app.get("sector-name").textContent,"Облачный слой");
+});
