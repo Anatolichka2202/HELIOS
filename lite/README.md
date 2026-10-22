@@ -1,4 +1,4 @@
-# HELIOS Lite — Venus Initiative (0.6)
+# HELIOS Lite — Venus Initiative (0.7)
 
 The first playable vertical slice is **Venus**. The planned franchise remains Solar System-wide.
 
@@ -54,7 +54,20 @@ See [Venus vertical slice](../design/VENUS_VERTICAL_SLICE.md), [campaign](../des
 - Sandbox difficulty presets: **standard / resource-constrained / well-funded**.
 - Automatic local save; backup **export/import JSON** for transferring a game between browsers.
 - PWA install metadata and service-worker shell caching (HTTPS; device verification pending).
-- 45 regression/contract/UI checks passed in an isolated JS execution environment; GitHub Actions success still requires checking its dashboard.
+- 61 regression/contract/UI checks passed in an isolated JS execution environment; GitHub Actions success still requires checking its dashboard.
 - Runtime assets and project-ID contract checks are part of CI.
 
 **To play locally:** `cd lite && npm run check && npm test && python3 -m http.server 8080`. To play from iPhone, deploy using `.github/workflows/pages.yml` after enabling GitHub Pages.
+
+## New in 0.7 — engineering consequences
+
+- An irreversible **reinforced vs lightweight aerostat** decision changes project cost, lab science, wear and storm severity.
+- New aerostats and labs undergo **one game-period commissioning**; their resources are reserved at construction start.
+- The first operating cloud lab encounters a **blocking acidic front**: risky sample, costly protection, or delayed retreat.
+- Dangerous sampling can unlock a new corrosion-resistant coating, with measurable engineering effects.
+- No supplies or power means **no stable-year progress and no productive laboratory output**.
+- Private investment entails recurring licence payments; open science grants research bonuses.
+- **Distinct story epilogues**, visual crisis warnings, and backward compatibility for existing version-four saves.
+- See [0.7 playtest guide](../docs/PLAYTEST_VENUS_0_7.md); native Unreal/Unity prototype rules have not yet adopted these changes.
+
+**Caution:** the game's mechanical periods are abstract and the science/engineering coefficients are uncalibrated. We have not measured real user retention or verified the browser build on physical iPhone Safari.
