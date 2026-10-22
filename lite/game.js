@@ -132,6 +132,7 @@ function drawOperations(){
  $("forecast-science").textContent=signed(forecast.science);
  $("forecast-energy").textContent=signed(forecast.energy);
  $("forecast-supplies").textContent=signed(forecast.supplies);
+ $("forecast-alert").textContent=forecast.shortage?"ДЕФИЦИТ: энергии или расходников не хватит. Аэростат потеряет до 22% состояния без учёта шторма.":"";
  $("visual-probe").classList.toggle("active",Engine.has(game,"probe"));
  $("visual-relay").classList.toggle("active",Engine.has(game,"relay"));
  $("visual-aerostat").classList.toggle("active",built);
