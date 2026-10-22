@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1322">
 <title>HELIOS — Venus Initiative</title><link rel="stylesheet" href="style.css"></head><body>
-<header><div class="brand"><span class="sun">◉</span><div><strong>HELIOS</strong><small>VENUS INITIATIVE · PROTOTYPE 0.3</small></div></div><div class="head-actions"><button id="save" class="ghost">Сохранить</button><button id="reset" class="ghost">Новая игра</button></div></header>
+<header><div class="brand"><span class="sun">◉</span><div><strong>HELIOS</strong><small>VENUS INITIATIVE · PLAYABLE V0.6</small></div></div><div class="head-actions"><button id="save" class="ghost">Сохранить</button><button id="reset" class="ghost">Новая игра</button></div></header>
 <main>
 <section class="hero">
 <div class="hero-content"><div class="kicker">ГЛАВА I / ЗАБЫТАЯ ПРОГРАММА</div><h1>Воскресить<br><em>Венеру</em></h1><p>СССР оставил закрытое досье. Молодой российский инженер считает, что у человечества есть шанс построить новый мир над облаками Венеры. Почти никто ему не верит.</p><div class="mode-buttons"><button id="campaign" class="primary">Кампания</button><button id="session">Свободная сессия</button></div></div>
@@ -9,6 +9,61 @@
 </section>
 <section class="status-bar"><div><small>ЭПОХА</small><b id="year">2034</b></div><div><small>БЮДЖЕТ</small><b id="credits">0</b></div><div><small>НАУКА</small><b id="science">0</b></div><div><small>ЭНЕРГИЯ</small><b id="power">0</b></div><div><small>СНАБЖЕНИЕ</small><b id="supplies">0</b></div></section>
 <section class="objective-strip" aria-label="Следующая цель экспедиции"><div class="objective-copy"><span class="kicker">ТЕКУЩАЯ ЗАДАЧА</span><h2 id="objective-title">—</h2><p id="objective-copy"></p></div><button id="focus-goal" class="objective-button">К цели →</button></section>
+<section class="field-report" aria-label="Живая венерианская инфраструктура">
+  <div class="field-scene">
+    <div class="section-head"><div><div class="kicker">ОБЛАЧНЫЙ ФРОНТИР</div><h2>Экспедиция «Венера»</h2></div><span class="mini" id="scene-stage">ПОДГОТОВКА</span></div>
+    <div class="illustrated-stage" id="illustrated-stage">
+      <svg viewBox="0 0 640 265" role="img" aria-label="Схема экспедиции и построенных сооружений" class="stage-svg">
+        <defs>
+          <linearGradient id="gas" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b6dfdd" stop-opacity=".12"/><stop offset="1" stop-color="#ffb871" stop-opacity=".1"/></linearGradient>
+        </defs>
+        <path d="M0 228 Q120 196 230 218 T450 205 T640 216 L640 265H0Z" fill="url(#gas)"/>
+        <path d="M0 245 Q170 210 320 238 T640 224" stroke="#efb77e" stroke-opacity=".32" stroke-width="4" fill="none"/>
+        <g id="visual-probe" class="stage-object">
+          <path d="M143 64 L184 86 L184 113 L143 135 L103 113 L103 86Z" fill="#a2c3cd" stroke="#e7f2ff" stroke-width="3"/>
+          <path d="M143 64L143 38M109 97H78M180 97H212M143 135L143 151" stroke="#f1c68f" stroke-width="3"/>
+          <circle cx="143" cy="98" r="11" fill="#173956"/>
+          <text x="140" y="171" text-anchor="middle" fill="#eac79b" font-size="14">ЗОНД</text>
+        </g>
+        <g id="visual-relay" class="stage-object">
+          <rect x="453" y="50" width="42" height="39" rx="4" fill="#d8c7a7" stroke="#fff0cf" stroke-width="3"/>
+          <rect x="387" y="42" width="64" height="54" fill="#285b86" stroke="#77b8d8" stroke-width="3"/>
+          <rect x="497" y="42" width="64" height="54" fill="#285b86" stroke="#77b8d8" stroke-width="3"/>
+          <path d="M474 49L474 20M451 20H497M418 43V96M527 43V96" stroke="#e9c590" stroke-width="2"/>
+          <text x="474" y="121" text-anchor="middle" fill="#eac79b" font-size="14">РЕТРАНСЛЯТОР</text>
+        </g>
+        <g id="visual-aerostat" class="stage-object">
+          <ellipse cx="323" cy="102" rx="111" ry="60" fill="#d7a477" stroke="#ffe0ae" stroke-width="3"/>
+          <path d="M212 103Q323 140 434 102 M244 57Q323 100 404 59 M322 42Q286 102 323 161 M322 42Q357 102 323 161" fill="none" stroke="#6c4c49" stroke-width="4" stroke-opacity=".65"/>
+          <path d="M254 147L278 189M393 145L365 189M323 163L323 190" stroke="#dbc4aa" stroke-width="4"/>
+          <path d="M276 190H370L362 215H282Z" fill="#7faeb9" stroke="#fcdfb8" stroke-width="3"/>
+          <rect x="292" y="194" width="18" height="10" fill="#f7dfa7"/><rect x="318" y="194" width="18" height="10" fill="#f7dfa7"/><rect x="344" y="194" width="13" height="10" fill="#f7dfa7"/>
+          <text x="323" y="247" text-anchor="middle" fill="#ffe0a9" font-size="14">АЭРОСТАТ</text>
+        </g>
+        <g id="visual-lab" class="stage-object">
+          <path d="M320 215L320 228M275 224H370" stroke="#ffe8bb" stroke-width="5"/>
+          <rect x="279" y="218" width="85" height="21" rx="5" fill="#a0d6ce" stroke="#effff9" stroke-width="3"/>
+          <circle cx="290" cy="228" r="4" fill="#f4ba61"/><circle cx="306" cy="228" r="4" fill="#f4ba61"/><circle cx="322" cy="228" r="4" fill="#f4ba61"/>
+        </g>
+      </svg>
+      <div class="scene-hint" id="scene-caption">Разработайте и запустите первый зонд</div>
+    </div>
+  </div>
+  <div class="field-dashboard">
+    <div class="kicker">ЭКСПЛУАТАЦИЯ И ПРОГНОЗ</div>
+    <h2>Состояние станции</h2>
+    <div class="readout"><span>Аэростат</span><strong id="condition">Не построен</strong></div>
+    <div class="meter" aria-hidden="true"><div id="condition-bar"></div></div>
+    <div class="readout"><span>Поставка в пути</span><strong id="shipment-status">—</strong></div>
+    <div class="readout"><span>Ближайший год</span><strong id="forecast-year">2035</strong></div>
+    <div class="forecast-grid">
+      <div><small>БЮДЖЕТ</small><b id="forecast-credits">+0</b></div><div><small>НАУКА</small><b id="forecast-science">+0</b></div>
+      <div><small>ЭНЕРГИЯ</small><b id="forecast-energy">+0</b></div><div><small>СНАБЖЕНИЕ</small><b id="forecast-supplies">0</b></div>
+    </div>
+    <div class="policy-panel"><small>РЕЖИМ РАБОТЫ</small><div id="policy-buttons" class="policies"></div><p id="policy-description" class="subtle">Появится после запуска аэростата.</p></div>
+    <p class="forecast-disclaimer">Прогноз без учёта будущих случайных событий. Временные интервалы и ресурсы условные.</p>
+  </div>
+</section>
 <div class="game-grid"><section class="panel"><div class="section-head"><div><div class="kicker">ВЕНЕРИАНСКИЙ ТЕАТР</div><h2>Высотные зоны</h2></div><span class="mini">условная модель</span></div><div class="layers" id="layers"></div><div class="weather"><span>АТМОСФЕРНЫЕ РИСКИ</span><strong id="hazard">—</strong></div><p class="subtle">Верхние облака — потенциальная область аэростатных платформ. Высоты, температуры и сроки здесь условны: физическую модель уточним отдельно.</p></section>
 <section class="panel controls"><div class="kicker">ОПЕРАЦИОННЫЙ ЦЕНТР</div><h2 id="sector-name">—</h2><p id="sector-copy" class="subtle"></p><div id="sector-status" class="status-pill"></div><h3>Инженерные проекты</h3><div id="projects" class="projects"></div></section></div>
 <div class="game-grid lower"><section class="panel narrative"><div class="kicker">АРХИВ ПРОГРАММЫ</div><h2 id="chapter-title">—</h2><p id="chapter-copy"></p><div id="story-actions" class="choices"></div></section><section class="panel"><div class="section-head"><h2>Оперативный журнал</h2><span class="mini" id="turn">ХОД 1</span></div><div id="events" class="events"></div><button id="next" class="primary next">Следующий ход <span>→</span></button><div id="message" role="status"></div></section></div>
