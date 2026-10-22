@@ -31,7 +31,7 @@ test("logistics two-turn contract agrees with the engine",()=>{
 });
 
 test("political funding choices reproduce the documented resource deltas",()=>{
-  assert.equal(spec.schemaVersion,4);
+  assert.equal(spec.schemaVersion,5);
   const c=E.apply(E.create(),{type:"council"}).state;
   for(const key of ["public","private"]){
     const r=E.apply(c,{type:"funding",id:key});
@@ -46,7 +46,7 @@ test("mission failure requires documented number of critical years",()=>{
 });
 
 test("operation policies share the same values as the game engine",()=>{
- assert.equal(spec.schemaVersion,4);
+ assert.equal(spec.schemaVersion,5);
  assert.equal(spec.operations.defaultPolicy,"standard");
  for(const key of ["conserve","standard","intensive"]){
    const engine=E.POLICIES[key];
@@ -72,4 +72,23 @@ test("session preset starting resources match shared contract",()=>{
    const state=E.create("session",id);
    for(const field of fields)assert.equal(state[field],spec.sessionPresets[id][field]);
  }
+});
+
+test("Lite exploratory designs and commissioning times match shared gameplay contract",()=>{
+ const experimental=spec.liteExperimentalV07;
+ for(const id of ["shield","light","legacy"]){
+  const e=E.DESIGNS[id],x=experimental.designs[id];
+  assert.deepEqual(e.cost,x.extraBuildCost);
+  assert.equal(e.wear,x.wearAdjustment);
+  assert.equal(e.storm,x.stormDamageAdjustment);
+  assert.equal(e.science,x.scienceAdjustment);
+ }
+ assert.equal(experimental.constructionDurations.aerostat,1);
+ assert.equal(experimental.constructionDurations.lab,1);
+});
+test("acid front science unlock has a published, bounded engineering cost",()=>{
+ const x=spec.liteExperimentalV07.acidResistantPrototype;
+ assert.deepEqual(x.cost,{credits:18,science:20,supplies:4});
+ assert.equal(x.wearMitigation,3);
+ assert.equal(x.stormMitigation,4);
 });
