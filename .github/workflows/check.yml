@@ -15,6 +15,8 @@ jobs:
           cd lite
           npm run check
           npm test
+      - name: Verify static game assets
+        run: python3 tools/verify_web_assets.py
   core:
     runs-on: ubuntu-latest
     steps:
@@ -24,3 +26,10 @@ jobs:
           cmake -S core -B /tmp/helios-core-build -DCMAKE_BUILD_TYPE=Debug
           cmake --build /tmp/helios-core-build --parallel
           ctest --test-dir /tmp/helios-core-build --output-on-failure
+  historical:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run preserved Python reference tests
+        working-directory: archive/p1-python
+        run: python3 -m unittest discover -s tests -v
