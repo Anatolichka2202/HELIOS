@@ -206,6 +206,8 @@ function drawOperations(){
  if(game.event){stage="КРИЗИС";caption="Кислотный фронт. Выберите ответ экспедиции, прежде чем продолжать симуляцию.";}
  if(game.prototype){caption="Экспериментальное защитное покрытие установлено. Износ и ущерб кислотных фронтов сокращены.";}
  if(game.finished){stage=game.outcome==="victory"?"МИССИЯ ВЫПОЛНЕНА":"МИССИЯ ПРОВАЛЕНА";caption=game.outcome==="victory"?"Венерианская исследовательская программа стала устойчивой.":"Время простоя уничтожило аэростат. Разберите решения и попробуйте другой путь.";}
+ $("illustrated-stage").classList.toggle("crisis",!!game.event);
+ $("illustrated-stage").classList.toggle("science-breakthrough",!!game.prototype);
  $("scene-stage").textContent=stage;
  $("scene-caption").textContent=caption;
  const policyRoot=$("policy-buttons");clear(policyRoot);
