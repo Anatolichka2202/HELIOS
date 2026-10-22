@@ -64,14 +64,18 @@ function drawProjects(){
 function drawStory(){
  const title=$("chapter-title"),copy=$("chapter-copy"),actions=$("story-actions");clear(actions);
  if(game.finished){
-  if(game.outcome==="failure"){
-   title.textContent="Венера не прощает ошибок";
-   copy.textContent="Аэростат остался без ремонта на два года. Платформа разрушена, финансирование программы остановлено. Экспедицию придётся начинать заново, учитывая снабжение, энергию и технический резерв.";
-  }else{
-   title.textContent="Облака стали домом";
-   copy.textContent="Три года непрерывных исследований доказали, что длительное присутствие на Венере возможно. Это начало истории, а не конец колонизации.";
-  }
-  actions.append(element("p","subtle","Итог: "+(game.outcome==="failure"?"миссия сорвана":"экспедиция завершена")+" · оценка "+Engine.score(game)+" · новая игра доступна сверху."));
+  const result=Engine.ending(game);
+  title.textContent=result.title;
+  copy.textContent=result.story;
+  const details=element("div","epilogue");
+  details.append(element("strong","","ИТОГОВЫЙ ОТЧЁТ"),
+    element("p","","Оценка: "+Engine.score(game)+" · Проектов введено: "+game.completed.length+
+      " · Устойчивых периодов: "+game.consecutiveYears+
+      " · Конструкция: "+(Engine.DESIGNS[game.design]?.name||"не выбрана")),
+    element("p","","Научная программа: "+(game.insight==="sample"?"рисковый пробоотбор":
+      game.insight==="protect"?"защита станции":game.insight==="retreat"?"остановка экспериментов":"без исследовательского кризиса")+
+      (game.prototype?" · создано кислотостойкое покрытие":"")));
+  actions.append(details,element("p","subtle","Попробуйте другую конструкцию, финансирование или научную тактику — последствия изменятся."));
  }else if(game.mode==="session"){
   title.textContent="Свободная венерианская сессия";
   copy.textContent="Режим: "+Engine.SESSION_PRESETS[game.preset||"standard"].name+". Постройте облачную лабораторию и обеспечьте три года устойчивой работы. Снабжение доставляется с Земли.";
