@@ -55,3 +55,46 @@ test("old version-four saves recover new optional fields",()=>{
   const restored=E.restore(JSON.stringify(original));
   assert.equal(restored.funding,null);assert.equal(restored.criticalYears,0);assert.equal(restored.outcome,null);
 });
+
+test("science vs maintenance: policies shift production, power, and reliability",()=>{
+ const base=campaignToBase();
+ const intensive=move(base,"policy","intensive").state;
+ const conservative=move(base,"policy","conserve").state;
+ const advanced=move(intensive,"next").state;
+ const saved=move(conservative,"next").state;
+ assert.ok(advanced.science>saved.science);
+ assert.ok(advanced.supplies<saved.supplies);
+ assert.ok(advanced.condition<saved.condition);
+ assert.equal(base.policy,"standard");
+});
+test("policy is disabled until a platform exists",()=>{
+ const start=E.create();
+ assert.ok(move(start,"policy","intensive").error);
+ assert.equal(start.policy,"standard");
+});
+test("forecast reflects chosen policy and queued shipments",()=>{
+ let s=campaignToBase();
+ s=move(s,"policy","conserve").state;
+ const first=E.forecast(s);
+ assert.equal(first.maintenance,2);
+ assert.equal(first.science,8);
+ s=move(s,"shipment").state;
+ assert.equal(E.forecast(s).incoming,0);
+ s=move(s,"next").state;
+ assert.equal(E.forecast(s).incoming,22);
+ assert.equal(s.lastTurn.year,s.year);
+});
+test("older save restores default work policy and forecast fields",()=>{
+ const state=E.create();
+ delete state.policy;
+ delete state.lastTurn;
+ const restored=E.restore(JSON.stringify(state));
+ assert.equal(restored.policy,"standard");
+ assert.equal(restored.lastTurn,null);
+});
+test("game score rewards stable successful mission",()=>{
+ let s=campaignToBase();
+ s=move(s,"next").state;s=move(s,"next").state;s=move(s,"next").state;
+ assert.equal(s.outcome,"victory");
+ assert.ok(E.score(s)>300);
+});
