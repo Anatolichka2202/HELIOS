@@ -31,8 +31,13 @@ function drawProjects(){
   const card=element("div","project");
   card.append(element("h4","",project.name),element("p","",project.description),element("small","",listCost(project.cost)));
   const done=Engine.has(game,project.id);
+  const queued=(game.buildQueue||[]).find(x=>x.id===project.id);
   const missing=project.requires.filter(x=>!Engine.has(game,x));
-  const label=done?"Завершено":missing.length?"Нужно: "+missing.map(x=>Engine.PROJECTS.find(p=>p.id===x)?.name||x).join(", "):"Реализовать";
+  const cost=Engine.projectCost(game,project.id);
+  card.children[2].textContent=listCost(cost);
+  const label=done?"В эксплуатации":queued?"Монтаж · до "+(2034+queued.ready-1)+" года":
+    project.id==="aerostat"&&!game.design?"Нужно выбрать конструкцию":
+    missing.length?"Нужно: "+missing.map(x=>Engine.PROJECTS.find(p=>p.id===x)?.name||x).join(", "):"Начать проект";
   card.append(makeButton(label,()=>change({type:"build",id:project.id}),!Engine.canBuild(game,project.id)));
   root.append(card);
  }
@@ -83,8 +88,43 @@ function drawStory(){
   actions.append(element("p","subtle","Международное соглашение действует. +9 бюджета каждый год."));
  }
 }
+function drawDecisions(){
+ const root=$("decision-card"),options=$("decision-options");
+ clear(options);
+ if(game.finished){root.hidden=true;return;}
+ if(game.event==="acid-front"){
+   root.hidden=false;
+   $("decision-title").textContent="Кислотный фронт над станцией";
+   $("decision-copy").textContent="Зонд зафиксировал необычную химическую структуру. Оболочка аэростата уже подвергается воздействию. Можно рискнуть ради открытия, срочно усилить защиту или прервать исследование.";
+   const choices=[
+    {id:"sample",title:"Взять образцы",effect:"+22 науки · −16 состояния аэростата",desc:"Мы получим редкие данные о Венере, но подставим платформу под кислотный фронт."},
+    {id:"protect",title:"Усилить защиту",effect:"−14 бюджета · −5 снабжения · +10 состояния",desc:"Устраним часть повреждений и снизим ущерб от будущих штормов."},
+    {id:"retreat",title:"Остановить эксперименты",effect:"+5 состояния · серия устойчивой работы обнуляется",desc:"Сохраняем исследовательскую платформу ценой научной программы и времени."}
+   ];
+   for(const choice of choices){
+    const b=makeButton(choice.title+" — "+choice.effect,()=>change({type:"respond",id:choice.id}),
+      choice.id==="protect"&&(game.credits<14||game.supplies<5),"decision-choice");
+    b.append(element("small","",choice.desc));options.append(b);
+   }
+   return;
+ }
+ const canChoose=game.design===null&&Engine.has(game,"probe")&&Engine.has(game,"relay")&&
+   (game.mode==="session"||game.international);
+ if(!canChoose){root.hidden=true;return;}
+ root.hidden=false;
+ $("decision-title").textContent="Каким будет первый аэростат?";
+ $("decision-copy").textContent="Два проекта отвечают на один инженерный вопрос по-разному. Выбор фиксируется до постройки платформы и влияет на цену строительства, исследования и опасность штормов.";
+ for(const d of [Engine.DESIGNS.shield,Engine.DESIGNS.light]){
+   const cost=Engine.projectCost({...game,design:d.id},"aerostat");
+   const b=makeButton(d.name+" · "+listCost(cost),()=>change({type:"design",id:d.id}),false,"decision-choice");
+   b.append(element("small","",d.description));options.append(b);
+ }
+}
 function nextObjective(){
  if(game.finished)return {title:game.outcome==="failure"?"Миссия сорвана":"Первая экспедиция завершена",description:"Откройте новую партию, чтобы попробовать другой путь.",zone:null};
+ if(game.event)return {title:"Срочное решение — кислотный фронт",description:"Экспедиция приостановлена до вашего инженерного решения. Выберите один из трёх способов реагирования.",zone:null};
+ if((game.buildQueue||[]).some(q=>q.id==="lab"))return {title:"Ввод лаборатории в эксплуатацию",description:"Оборудование монтируется. Завершите следующий игровой период.",zone:null};
+ if((game.buildQueue||[]).some(q=>q.id==="aerostat"))return {title:"Монтаж первого аэростата",description:"Конструкция выбрана, расходники зарезервированы. Завершите следующий игровой период.",zone:null};
  if(game.mode==="campaign"&&game.storyStep===0)return {title:"Доказать возможность проекта",description:"Вынесите расчёты на российский научный совет.",zone:null};
  if(game.mode==="campaign"&&game.storyStep===1&&game.funding===null)return {title:"Выбрать финансирование",description:"Государственная открытая наука или частные инвесторы — решение повлияет на международные переговоры.",zone:null};
  const required=[
@@ -96,6 +136,7 @@ function nextObjective(){
   if(!Engine.has(game,id))return {title,description,zone:Engine.PROJECTS.find(p=>p.id===id).zone};
  }
  if(game.mode==="campaign"&&game.storyStep===1)return {title:"Открыть международную программу",description:"Покажите результаты исследований партнёрам и согласуйте совместную миссию.",zone:null};
+ if(!game.design)return {title:"Выбрать конструкцию аэростата",description:"Дорогая защита уменьшит аварии; лёгкая платформа ускорит науку, но потребует тщательного обслуживания.",zone:null};
  const expansion=[
   ["aerostat","Развернуть первый аэростат","Проверьте научный демонстратор в облаках Венеры."],
   ["logistics","Организовать грузовые рейсы","Грузы с Земли приходят через два игровых хода (пока без реальной баллистики)."],
@@ -136,12 +177,17 @@ function drawOperations(){
  $("visual-probe").classList.toggle("active",Engine.has(game,"probe"));
  $("visual-relay").classList.toggle("active",Engine.has(game,"relay"));
  $("visual-aerostat").classList.toggle("active",built);
+ $("visual-aerostat").classList.toggle("building",(game.buildQueue||[]).some(q=>q.id==="aerostat"));
  $("visual-aerostat").classList.toggle("damaged",built&&game.condition<45);
  $("visual-lab").classList.toggle("active",Engine.has(game,"lab"));
+ $("visual-lab").classList.toggle("building",(game.buildQueue||[]).some(q=>q.id==="lab"));
  let stage="ПОДГОТОВКА",caption="Сначала восстановите архив, затем отправьте атмосферный зонд.";
  if(Engine.has(game,"probe")){stage="ИССЛЕДОВАНИЯ";caption="Зонд начал изучать химическую и динамическую среду Венеры.";}
  if(Engine.has(game,"aerostat")){stage="АЭРОСТАТ";caption="Первый аппарат закрепился в облачном слое. Следите за состоянием и снабжением.";}
  if(Engine.has(game,"lab")){stage="ЛАБОРАТОРИЯ";caption="Исследовательская станция действует: "+game.consecutiveYears+"/3 устойчивых лет.";}
+ if((game.buildQueue||[]).some(q=>q.id==="aerostat")){stage="МОНТАЖ";caption="Инженеры собирают "+Engine.DESIGNS[game.design].name.toLowerCase()+". Ввод после следующего периода.";}
+ if((game.buildQueue||[]).some(q=>q.id==="lab")){stage="МОНТАЖ ЛАБОРАТОРИИ";caption="Научные модули проходят установку. Требуется один игровой период.";}
+ if(game.event){stage="КРИЗИС";caption="Кислотный фронт. Выберите ответ экспедиции, прежде чем продолжать симуляцию.";}
  if(game.finished){stage=game.outcome==="victory"?"МИССИЯ ВЫПОЛНЕНА":"МИССИЯ ПРОВАЛЕНА";caption=game.outcome==="victory"?"Венерианская исследовательская программа стала устойчивой.":"Время простоя уничтожило аэростат. Разберите решения и попробуйте другой путь.";}
  $("scene-stage").textContent=stage;
  $("scene-caption").textContent=caption;
@@ -166,9 +212,9 @@ function render(){
  $("campaign").classList.toggle("selected",game.mode==="campaign");
  $("session").classList.toggle("selected",game.mode==="session");
  if(game.mode==="session")$("session-preset").value=game.preset||"standard";
- $("next").disabled=game.finished;
+ $("next").disabled=game.finished||!!game.event;
  $("next").querySelector("span").textContent=game.finished?"✓":"→";
- drawZones();drawProjects();drawStory();drawObjective();drawOperations();
+ drawZones();drawProjects();drawStory();drawObjective();drawOperations();drawDecisions();
  $("events").replaceChildren(...game.log.slice(0,9).map(x=>element("div","",x)));
  $("message").textContent=feedback;
 }
@@ -182,12 +228,14 @@ $("next").addEventListener("click",()=>change({type:"next"}));
 $("focus-goal").addEventListener("click",()=>{
  const goal=nextObjective();
  if(goal.zone)change({type:"select",id:goal.zone});
+ else if(game.event||(!game.design&&Engine.has(game,"probe")&&Engine.has(game,"relay")))
+   $("decision-card").scrollIntoView?.({behavior:"smooth",block:"center"});
  else $("story-actions").scrollIntoView?.({behavior:"smooth",block:"center"});
 });
 $("campaign").addEventListener("click",()=>switchMode("campaign"));
 $("session").addEventListener("click",()=>switchMode("session"));
 $("save").addEventListener("click",()=>{feedback=persist()?"Прогресс сохранён на этом устройстве.":"Браузер не разрешил сохранить игру.";render();});
-$("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;game=Engine.create(game.mode);persist();feedback="Начата новая игра.";render();});
+$("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;game=Engine.create(game.mode,game.preset||"standard");persist();feedback="Начата новая игра.";render();});
 
 $("export-save").addEventListener("click",()=>{
  try{
