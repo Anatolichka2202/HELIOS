@@ -38,7 +38,7 @@ function drawProjects(){
  }
  if(game.selected==="orbit"&&Engine.has(game,"logistics")){
   const card=element("div","project");
-  card.append(element("h4","","Отправить снабжение с Земли"),element("p","","22 единицы через два хода. Перевозка стоит 16 бюджета и 3 энергии."));
+  card.append(element("h4","","Отправить снабжение с Земли"),element("p","","22 единицы через два игровых хода. Перевозка стоит 16 бюджета и 3 энергии."));
   card.append(makeButton("Заказать груз",()=>change({type:"shipment"}),game.credits<16||game.energy<3||game.finished));root.append(card);
  }
  if(game.selected==="clouds"&&Engine.has(game,"aerostat")){
@@ -57,10 +57,10 @@ function drawStory(){
    title.textContent="Облака стали домом";
    copy.textContent="Три года непрерывных исследований доказали, что длительное присутствие на Венере возможно. Это начало истории, а не конец колонизации.";
   }
-  actions.append(element("p","subtle","Итог: "+(game.outcome==="failure"?"миссия сорвана":"экспедиция завершена")+" · новая игра доступна сверху."));
+  actions.append(element("p","subtle","Итог: "+(game.outcome==="failure"?"миссия сорвана":"экспедиция завершена")+" · оценка "+Engine.score(game)+" · новая игра доступна сверху."));
  }else if(game.mode==="session"){
   title.textContent="Свободная венерианская сессия";
-  copy.textContent="Задача: построить облачную лабораторию и обеспечить три года устойчивой работы платформы. Снабжение доставляется с Земли по открытому маршруту.";
+  copy.textContent="Задача: построить облачную лабораторию и обеспечить три года устойчивой работы платформы. Снабжение доставляется с Земли по открытой грузовой программе.";
   actions.append(element("p","subtle","История не ограничивает строительство, но инженерные требования сохраняются."));
  }else if(game.storyStep===0){
   title.textContent="Досье, которого не существовало";
@@ -98,7 +98,7 @@ function nextObjective(){
  if(game.mode==="campaign"&&game.storyStep===1)return {title:"Открыть международную программу",description:"Покажите результаты исследований партнёрам и согласуйте совместную миссию.",zone:null};
  const expansion=[
   ["aerostat","Развернуть первый аэростат","Проверьте научный демонстратор в облаках Венеры."],
-  ["logistics","Организовать грузовые рейсы","Грузы с Земли приходят через два года условного игрового времени."],
+  ["logistics","Организовать грузовые рейсы","Грузы с Земли приходят через два игровых хода (пока без реальной баллистики)."],
   ["lab","Построить облачную лабораторию","Научная станция должна работать несмотря на износ."]
  ];
  for(const [id,title,description] of expansion){
@@ -115,6 +115,45 @@ function drawObjective(){
  $("focus-goal").textContent=goal.zone?"Перейти к сектору →":"Перейти к решению ↓";
  $("focus-goal").disabled=game.finished;
 }
+
+function signed(value){
+ return (value>0?"+":"")+value;
+}
+function drawOperations(){
+ const forecast=Engine.forecast(game);
+ const built=Engine.has(game,"aerostat");
+ const shipments=(game.shipments||[]).slice().sort((a,b)=>a.arrival-b.arrival);
+ $("condition").textContent=built?game.condition+"% / "+(game.condition>=60?"Штатно":game.condition>0?"Требует ремонта":"Авария"):"Не построен";
+ $("condition-bar").style.width=built?game.condition+"%":"0%";
+ $("shipment-status").textContent=shipments.length?
+   shipments.length+" рейс(ов) · ближайший: "+shipments[0].arrival+" ход":"Груза в пути нет";
+ $("forecast-year").textContent=forecast.nextYear;
+ $("forecast-credits").textContent=signed(forecast.credits);
+ $("forecast-science").textContent=signed(forecast.science);
+ $("forecast-energy").textContent=signed(forecast.energy);
+ $("forecast-supplies").textContent=signed(forecast.supplies);
+ $("visual-probe").classList.toggle("active",Engine.has(game,"probe"));
+ $("visual-relay").classList.toggle("active",Engine.has(game,"relay"));
+ $("visual-aerostat").classList.toggle("active",built);
+ $("visual-aerostat").classList.toggle("damaged",built&&game.condition<45);
+ $("visual-lab").classList.toggle("active",Engine.has(game,"lab"));
+ let stage="ПОДГОТОВКА",caption="Сначала восстановите архив, затем отправьте атмосферный зонд.";
+ if(Engine.has(game,"probe")){stage="ИССЛЕДОВАНИЯ";caption="Зонд начал изучать химическую и динамическую среду Венеры.";}
+ if(Engine.has(game,"aerostat")){stage="АЭРОСТАТ";caption="Первый аппарат закрепился в облачном слое. Следите за состоянием и снабжением.";}
+ if(Engine.has(game,"lab")){stage="ЛАБОРАТОРИЯ";caption="Исследовательская станция действует: "+game.consecutiveYears+"/3 устойчивых лет.";}
+ if(game.finished){stage=game.outcome==="victory"?"МИССИЯ ВЫПОЛНЕНА":"МИССИЯ ПРОВАЛЕНА";caption=game.outcome==="victory"?"Венерианская исследовательская программа стала устойчивой.":"Время простоя уничтожило аэростат. Разберите решения и попробуйте другой путь.";}
+ $("scene-stage").textContent=stage;
+ $("scene-caption").textContent=caption;
+ const policyRoot=$("policy-buttons");clear(policyRoot);
+ for(const p of Object.values(Engine.POLICIES)){
+   const btn=makeButton(p.name,()=>change({type:"policy",id:p.id}),!built||game.finished,"policy"+(game.policy===p.id?" active":""));
+   policyRoot.append(btn);
+ }
+ $("policy-description").textContent=built?
+   Engine.POLICIES[game.policy||"standard"].description+" · "+(Engine.has(game,"lab")?"Затраты: "+forecast.maintenance+" снабжения/ход.":"Полный выбор режима действует после создания лаборатории."):
+   "Режимы откроются после запуска аэростата.";
+}
+
 function render(){
  const zone=Engine.ZONES.find(z=>z.id===game.selected);
  $("year").textContent=game.year;$("credits").textContent=game.credits;$("science").textContent=game.science;
@@ -127,7 +166,7 @@ function render(){
  $("session").classList.toggle("selected",game.mode==="session");
  $("next").disabled=game.finished;
  $("next").querySelector("span").textContent=game.finished?"✓":"→";
- drawZones();drawProjects();drawStory();drawObjective();
+ drawZones();drawProjects();drawStory();drawObjective();drawOperations();
  $("events").replaceChildren(...game.log.slice(0,9).map(x=>element("div","",x)));
  $("message").textContent=feedback;
 }
