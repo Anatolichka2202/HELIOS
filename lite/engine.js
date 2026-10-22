@@ -232,6 +232,34 @@ function forecast(s){
  construction:s.buildQueue.map(q=>({...q})),
  stormRisk:"Прогноз без непредвиденного кислотного шторма."};
 }
+function ending(s){
+ if(!s.finished)return null;
+ if(s.outcome==="failure")return {
+   title:"Венера не прощает ошибок",
+   story:"Аэростат остался без ремонта на два периода. Связь с платформой потеряна. Отчёт экспедиции сохранит причины провала, а следующий инженерный проект начнётся уже с их учётом.",
+   id:"lost-expedition"
+ };
+ if(s.prototype)return {
+   title:"Материал для нового мира",
+   story:"Рискованный пробоотбор привёл к созданию кислотостойкого покрытия. Российская программа и её партнёры доказали, что над Венерой возможна не только краткая экспедиция, но и новая инженерная отрасль.",
+   id:"research-breakthrough"
+ };
+ if(s.funding==="private")return {
+   title:"Венера под контрактом",
+   story:"Лаборатория стабильно работает, но созданная инфраструктура связана обязательствами перед инвесторами. Венера открыта для промышленного освоения — и споров о том, кому принадлежат открытия.",
+   id:"licensed-colony"
+ };
+ if(s.design==="light")return {
+   title:"На грани атмосферы",
+   story:"Лёгкая платформа пережила многолетние испытания благодаря ремонтам и правильному снабжению. Научная команда получила ценные данные, доказав право рискованной конструкции на жизнь.",
+   id:"high-risk-science"
+ };
+ return {
+   title:"Крепость в облаках",
+   story:"Защищённая аэростатная платформа превратилась в надёжный исследовательский форпост. Вместо быстрой сенсации программа выбрала долговечность — теперь на этой основе можно строить следующую экспедицию.",
+   id:"protected-outpost"
+ };
+}
 function score(s){
  return Math.max(0,Math.round(
    (s.outcome==="victory"?300:0)
@@ -242,5 +270,5 @@ function score(s){
    -Math.max(0,s.turn-1)*8
  ));
 }
-return {ZONES,PROJECTS,POLICIES,DESIGNS,SESSION_PRESETS,create,apply,has,canBuild,projectCost,restore,forecast,score};
+return {ZONES,PROJECTS,POLICIES,DESIGNS,SESSION_PRESETS,create,apply,has,canBuild,projectCost,restore,forecast,score,ending};
 });
