@@ -5,7 +5,7 @@ const E=require("../engine.js");
 const move=(state,type,id)=>E.apply(state,{type,id});
 function campaignToBase(){
  let s=E.create();
- for(const [type,id] of [["council"],["build","archive"],["build","probe"],["build","relay"],["treaty"],["build","aerostat"],["build","logistics"],["build","lab"]]){
+ for(const [type,id] of [["council"],["funding","public"],["build","archive"],["build","probe"],["build","relay"],["treaty"],["build","aerostat"],["build","logistics"],["build","lab"]]){
   const r=move(s,type,id);assert.equal(r.error,null,JSON.stringify({type,id,error:r.error}));s=r.state;
  }
  return s;
@@ -22,3 +22,36 @@ test("campaign victory requires three stable years",()=>{let s=campaignToBase();
 test("out-of-supply platform degrades faster",()=>{let s=campaignToBase();s={...s,supplies:0,energy:0};const after=move(s,"next").state;assert.ok(after.condition<=78);});
 test("valid saves restore and malformed saves are rejected",()=>{const s=campaignToBase();assert.deepEqual(E.restore(JSON.stringify(s)),s);assert.equal(E.restore("not json"),null);assert.equal(E.restore('{"version":0}'),null);});
 test("unknown actions and zones are rejected",()=>{const s=E.create();assert.ok(move(s,"nonsense").error);assert.ok(move(s,"select","pluto").error);});
+
+test("funding branches create distinct meaningful economic outcomes",()=>{
+  let base=E.apply(E.create(),{type:"council"}).state;
+  const publicPath=E.apply(base,{type:"funding",id:"public"}).state;
+  const privatePath=E.apply(base,{type:"funding",id:"private"}).state;
+  assert.equal(publicPath.funding,"public");
+  assert.equal(privatePath.funding,"private");
+  assert.equal(publicPath.credits,base.credits-8);
+  assert.equal(publicPath.science,base.science+12);
+  assert.equal(privatePath.credits,base.credits+36);
+  assert.equal(privatePath.science,base.science-6);
+  assert.ok(E.apply(publicPath,{type:"funding",id:"private"}).error);
+});
+test("treaty cannot be signed without an explicit funding choice",()=>{
+  let s=E.create();
+  for(const [type,id] of [["council"],["build","archive"],["build","probe"],["build","relay"]]){
+    const r=E.apply(s,{type,id});assert.equal(r.error,null);s=r.state;
+  }
+  assert.ok(E.apply(s,{type:"treaty"}).error);
+});
+test("aerostat lost for two consecutive years ends the mission in failure",()=>{
+  let s=campaignToBase();s={...s,condition:0,supplies:0,energy:0};
+  s=E.apply(s,{type:"next"}).state;
+  assert.equal(s.finished,false);
+  s=E.apply(s,{type:"next"}).state;
+  assert.equal(s.finished,true);
+  assert.equal(s.outcome,"failure");
+});
+test("old version-four saves recover new optional fields",()=>{
+  let original=E.create();delete original.funding;delete original.criticalYears;delete original.outcome;
+  const restored=E.restore(JSON.stringify(original));
+  assert.equal(restored.funding,null);assert.equal(restored.criticalYears,0);assert.equal(restored.outcome,null);
+});
