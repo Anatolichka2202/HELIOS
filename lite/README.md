@@ -54,7 +54,7 @@ See [Venus vertical slice](../design/VENUS_VERTICAL_SLICE.md), [campaign](../des
 - Sandbox difficulty presets: **standard / resource-constrained / well-funded**.
 - Automatic local save; backup **export/import JSON** for transferring a game between browsers.
 - PWA install metadata and service-worker shell caching (HTTPS; device verification pending).
-- 43 regression/contract/UI checks passed in an isolated JS execution environment; GitHub Actions success still requires checking its dashboard.
+- 45 regression/contract/UI checks passed in an isolated JS execution environment; GitHub Actions success still requires checking its dashboard.
 - Runtime assets and project-ID contract checks are part of CI.
 
 **To play locally:** `cd lite && npm run check && npm test && python3 -m http.server 8080`. To play from iPhone, deploy using `.github/workflows/pages.yml` after enabling GitHub Pages.
