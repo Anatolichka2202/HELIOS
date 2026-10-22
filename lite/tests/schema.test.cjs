@@ -29,3 +29,18 @@ test("logistics two-turn contract agrees with the engine",()=>{
   assert.equal(state.shipments.length,0);
   assert.equal(state.supplies-before,spec.supply.shipmentUnits);
 });
+
+test("political funding choices reproduce the documented resource deltas",()=>{
+  assert.equal(spec.schemaVersion,2);
+  const c=E.apply(E.create(),{type:"council"}).state;
+  for(const key of ["public","private"]){
+    const r=E.apply(c,{type:"funding",id:key});
+    assert.equal(r.error,null);
+    const delta=spec.fundingChoices[key].initialDelta;
+    assert.equal(r.state.credits,c.credits+delta.credits);
+    assert.equal(r.state.science,c.science+delta.science);
+  }
+});
+test("mission failure requires documented number of critical years",()=>{
+  assert.equal(spec.outcomes.missionFailureConsecutiveYears,2);
+});
