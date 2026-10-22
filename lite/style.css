@@ -58,3 +58,5 @@ header{flex-wrap:wrap}
 }
 
 .preset-label{display:block;color:#c0d5df;font-size:11px;margin-top:12px;line-height:1.6}.preset-label select{display:block;max-width:310px;width:100%;font:inherit;font-size:13px;color:#f2e2c6;background:#23384c;border:1px solid #7493a5;border-radius:9px;padding:9px 12px;margin-top:5px;min-height:40px}.preset-label select:focus-visible{outline:2px solid #7dd5dc;outline-offset:3px}@media(max-width:760px){.preset-label{max-width:82%}}
+
+.forecast-alert{padding:10px 11px;background:#672d33aa;border:1px solid #b25e5f;color:#ffe8dc;border-radius:9px;font-size:12px;line-height:1.4}.forecast-alert:empty{display:none}
