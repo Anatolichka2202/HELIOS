@@ -60,3 +60,22 @@ header{flex-wrap:wrap}
 .preset-label{display:block;color:#c0d5df;font-size:11px;margin-top:12px;line-height:1.6}.preset-label select{display:block;max-width:310px;width:100%;font:inherit;font-size:13px;color:#f2e2c6;background:#23384c;border:1px solid #7493a5;border-radius:9px;padding:9px 12px;margin-top:5px;min-height:40px}.preset-label select:focus-visible{outline:2px solid #7dd5dc;outline-offset:3px}@media(max-width:760px){.preset-label{max-width:82%}}
 
 .forecast-alert{padding:10px 11px;background:#672d33aa;border:1px solid #b25e5f;color:#ffe8dc;border-radius:9px;font-size:12px;line-height:1.4}.forecast-alert:empty{display:none}
+
+/* 0.7: consequential choices, visible engineering commissioning. */
+.decision-card{position:relative;padding:22px 24px;margin:18px 0;border:1px solid #d6a066;border-radius:16px;
+ background:linear-gradient(120deg,#432d39e8,#2b3e50f0 65%,#172940);box-shadow:0 14px 34px #03091355}
+.decision-card[hidden]{display:none}
+.decision-header{display:flex;justify-content:space-between;gap:16px;align-items:center}
+.decision-header h2{margin:5px 0;color:#ffe2b9;font-size:24px}
+.decision-card p{font-size:14px;color:#d5dce6;line-height:1.55;margin:8px 0 18px;max-width:920px}
+.decision-emblem{font-size:44px;color:#efbc81;opacity:.7}
+.decision-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:11px}
+.decision-choice{text-align:left;min-height:110px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+ padding:15px 16px;white-space:normal;line-height:1.4;font-size:14px;color:#ffead0;
+ border:1px solid #cfa0708a;background:linear-gradient(135deg,#2a4758,#263043);border-radius:11px}
+.decision-choice:hover:not(:disabled){border-color:#fff0ce;background:linear-gradient(135deg,#31546a,#40384e)}
+.decision-choice small{display:block;color:#b8cad6;font-size:12px;font-weight:400;margin-top:10px;line-height:1.4}
+.decision-choice:disabled{opacity:.5;cursor:not-allowed}
+.stage-object.building{opacity:.4;filter:grayscale(.55) drop-shadow(0 0 6px #f1d6a0)}
+@media(max-width:760px){.decision-card{padding:15px}.decision-header h2{font-size:20px}.decision-card p{font-size:13px}.decision-options{grid-template-columns:1fr}.decision-choice{min-height:84px}}
+@media(prefers-reduced-motion:reduce){.decision-choice{transition:none}}
