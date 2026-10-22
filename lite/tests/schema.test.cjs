@@ -44,3 +44,24 @@ test("political funding choices reproduce the documented resource deltas",()=>{
 test("mission failure requires documented number of critical years",()=>{
   assert.equal(spec.outcomes.missionFailureConsecutiveYears,2);
 });
+
+test("operation policies share the same values as the game engine",()=>{
+ assert.equal(spec.schemaVersion,3);
+ assert.equal(spec.operations.defaultPolicy,"standard");
+ for(const key of ["conserve","standard","intensive"]){
+   const engine=E.POLICIES[key];
+   const contract=spec.operations.policyOptions[key];
+   assert.equal(engine.supplies,contract.supplies);
+   assert.equal(engine.energy,contract.energy);
+   assert.equal(engine.science,contract.science);
+   assert.equal(engine.wear,contract.wear);
+ }
+});
+test("maintenance and transport cost definitions stay consistent",()=>{
+ const state=E.create("session");
+ assert.equal(spec.operations.repair.cost.credits,12);
+ assert.equal(spec.operations.repair.cost.supplies,7);
+ assert.equal(spec.operations.repair.restoredCondition,35);
+ assert.equal(spec.supply.turnsToArrive,2);
+ assert.equal(state.policy,spec.operations.defaultPolicy);
+});
