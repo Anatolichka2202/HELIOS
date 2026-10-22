@@ -32,7 +32,7 @@ jobs:
       - name: Stage static game files
         run: |
           mkdir -p public
-          cp lite/index.html lite/style.css lite/engine.js lite/game.js public/
+          cp lite/index.html lite/style.css lite/engine.js lite/game.js lite/sw.js lite/manifest.webmanifest public/
           mkdir -p public/assets
           cp -R lite/assets/. public/assets/
       - uses: actions/configure-pages@v5
