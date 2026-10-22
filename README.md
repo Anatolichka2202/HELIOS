@@ -4,15 +4,28 @@ Multi-platform strategy project about human expansion across the **entire Solar 
 
 > Early development: source code and prototypes are here, but no production game or verified mobile/UE build is claimed.
 
+## Start here — concept, architecture and what the code really does
+
+**[Документы HELIOS: общий замысел + три спецификации + игровая и коммерческая экономика](design/00_INDEX.md)**
+
+**[Код для новичка: где что лежит и как работает](docs/START_HERE.md)**
+
+**[Полная карта кода](docs/CODEBASE_MAP.md)** · **[Технический аудит](docs/TECHNICAL_AUDIT.md)**
+
+Decisions (draft 0.3): whole Solar System franchise; **Venus-only first campaign and sessions**. PC — UE5 narrative industrial strategy with limited first-person episodes, Mobile — Unity C# touch-first colony/logistics strategy, Lite — browser turn-based economic/narrative strategy. All single-player experiences must work offline; servers are optional later.
+
+These are **product specifications, not claims of implemented features**. See the actual codebase map for the implemented state.
+
+
 ## Workstreams
 
 | Directory | Purpose | Current status |
 |---|---|---|
-| [lite/](lite/) | Browser Venus Initiative | Interactive source, testable engine, on-device save; deployment pending |
+| [lite/](lite/) | Browser Venus Initiative | Venus 0.5 source, unit/contract/UI tests, local autosave; public device validation pending |
 | [pc/](pc/) | Unreal Engine 5 / C++ flagship | UE scaffold and Venus scene actor; build unverified |
 | [mobile/](mobile/) | Unity / C# for Android/iOS | Venus scene preview and mission catalog; device builds unverified |
 | [core/](core/) | C++ simulation research prototype | CMake and smoke test |
-| [shared/](shared/) | Cross-platform data contracts | Venus schema v1 |
+| [shared/](shared/) | Cross-platform data contracts | Venus schema v2 (not fully consumed by native clients) |
 | [design/](design/) | Narrative, architecture, roadmap and business assumptions | Venus campaign and long-term franchise |
 
 ## Run Lite locally
