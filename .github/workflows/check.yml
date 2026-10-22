@@ -19,11 +19,14 @@ jobs:
         run: python3 tools/verify_web_assets.py
   core:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
     steps:
       - uses: actions/checkout@v4
       - name: Build and test C++ core
         run: |
-          cmake -S core -B /tmp/helios-core-build -DCMAKE_BUILD_TYPE=Debug
+          cmake -S core -B /tmp/helios-core-build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           cmake --build /tmp/helios-core-build --parallel
           ctest --test-dir /tmp/helios-core-build --output-on-failure
   historical:
