@@ -1,8 +1,8 @@
 "use strict";
 // Offline shell only. No analytics, push notifications or background sync.
-const CACHE="helios-venus-shell-v0.7";
+const CACHE="helios-venus-shell-v0.7-franchise";
 const ASSETS=[
- "./","./index.html","./style.css","./engine.js","./game.js",
+ "./","./index.html","./style.css","./engine.js","./ecosystem.js","./game.js",
  "./manifest.webmanifest","./assets/helios-icon.svg","./assets/venus-clouds.svg"
 ];
 self.addEventListener("install",event=>{
