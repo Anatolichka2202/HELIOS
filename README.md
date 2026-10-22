@@ -8,7 +8,7 @@ Multi-platform strategy project about human expansion across the **entire Solar 
 
 **[Документы HELIOS: общий замысел + три спецификации + игровая и коммерческая экономика](design/00_INDEX.md)**
 
-**[Код для новичка: где что лежит и как работает](docs/START_HERE.md)**
+**[Код для новичка: где что лежит и как работает](docs/START_HERE.md)** · **[Реализовано в 0.6](docs/IMPLEMENTATION_0_6.md)**
 
 **[Полная карта кода](docs/CODEBASE_MAP.md)** · **[Технический аудит](docs/TECHNICAL_AUDIT.md)**
 
@@ -21,11 +21,11 @@ These are **product specifications, not claims of implemented features**. See th
 
 | Directory | Purpose | Current status |
 |---|---|---|
-| [lite/](lite/) | Browser Venus Initiative | Venus 0.5 source, unit/contract/UI tests, local autosave; public device validation pending |
-| [pc/](pc/) | Unreal Engine 5 / C++ flagship | UE scaffold and Venus scene actor; build unverified |
+| [lite/](lite/) | Browser Venus Initiative | Venus 0.6 source, production/tradeoff loop, PWA/cache, backup saves; real iPhone test pending |
+| [pc/](pc/) | Unreal Engine 5 / C++ flagship | UE mission subsystem, keyboard prototype, 3D scene + in-world console; build unverified |
 | [mobile/](mobile/) | Unity / C# for Android/iOS | Venus scene preview and mission catalog; device builds unverified |
 | [core/](core/) | C++ simulation research prototype | CMake and smoke test |
-| [shared/](shared/) | Cross-platform data contracts | Venus schema v2 (not fully consumed by native clients) |
+| [shared/](shared/) | Cross-platform data contracts | Venus schema v4; static ID contract across clients, not yet runtime-integrated |
 | [design/](design/) | Narrative, architecture, roadmap and business assumptions | Venus campaign and long-term franchise |
 
 ## Run Lite locally
