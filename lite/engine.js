@@ -25,7 +25,22 @@ const POLICIES=Object.freeze({
   standard:{id:"standard",name:"Штатная работа",supplies:5,energy:3,science:8,wear:4,description:"Сбалансированные исследования и эксплуатация."},
   intensive:{id:"intensive",name:"Интенсивные опыты",supplies:8,energy:5,science:13,wear:8,description:"Больше научных данных, но дорогие расходники и ускоренный износ."}
 });
-function create(mode="campaign"){if(!["campaign","session"].includes(mode))throw Error("Invalid mode");return {version:4,mode,turn:1,year:2034,credits:mode==="session"?170:125,science:mode==="session"?36:20,energy:25,supplies:32,selected:"orbit",completed:[],shipments:[],condition:0,consecutiveYears:0,international:false,storyStep:0,funding:null,criticalYears:0,outcome:null,policy:"standard",lastTurn:null,finished:false,log:["2034 · В России обнаружен архив закрытой венерианской программы."]};}
+const SESSION_PRESETS=Object.freeze({
+ standard:{name:"Стандарт",credits:170,science:36,energy:25,supplies:32,description:"Сбалансированная первая экспедиция."},
+ constrained:{name:"Дефицит",credits:120,science:26,energy:20,supplies:20,description:"Поставки и финансирование особенно важны."},
+ funded:{name:"Консорциум",credits:250,science:60,energy:40,supplies:55,description:"Больше ресурсов для крупных инженерных экспериментов."}
+});
+function create(mode="campaign",preset="standard"){
+ if(!["campaign","session"].includes(mode))throw Error("Invalid mode");
+ if(!SESSION_PRESETS[preset])throw Error("Invalid preset");
+ const starting=SESSION_PRESETS[preset];
+ return {version:4,mode,preset:mode==="session"?preset:"standard",turn:1,year:2034,
+  credits:mode==="session"?starting.credits:125,science:mode==="session"?starting.science:20,
+  energy:mode==="session"?starting.energy:25,supplies:mode==="session"?starting.supplies:32,
+  selected:"orbit",completed:[],shipments:[],condition:0,consecutiveYears:0,international:false,
+  storyStep:0,funding:null,criticalYears:0,outcome:null,policy:"standard",lastTurn:null,finished:false,
+  log:["2034 · В России обнаружен архив закрытой венерианской программы."]};
+}
 function copy(s){return {...s,completed:[...s.completed],shipments:s.shipments.map(x=>({...x})),log:[...s.log],lastTurn:s.lastTurn?{...s.lastTurn}:null};}
 function has(s,id){return s.completed.includes(id);}
 function addLog(s,text){s.log.unshift(s.year+" · "+text);s.log=s.log.slice(0,25);}
@@ -88,8 +103,9 @@ function restore(json){try{const s=JSON.parse(json);if(!s||s.version!==4||!["cam
  if(s.criticalYears===undefined)s.criticalYears=0;
  if(s.outcome===undefined)s.outcome=s.finished?"victory":null;
  if(s.policy===undefined)s.policy="standard";
+ if(s.preset===undefined)s.preset="standard";
  if(s.lastTurn===undefined)s.lastTurn=null;
- if(![null,"public","private"].includes(s.funding)||!Number.isInteger(s.criticalYears)||s.criticalYears<0||!POLICIES[s.policy])return null;
+ if(![null,"public","private"].includes(s.funding)||!Number.isInteger(s.criticalYears)||s.criticalYears<0||!POLICIES[s.policy]||!SESSION_PRESETS[s.preset])return null;
  return s;}catch{return null;}}
 function forecast(s){
  const policy=(has(s,"lab")?POLICIES[s.policy||"standard"]:null);
@@ -116,5 +132,5 @@ function score(s){
    -Math.max(0,s.turn-1)*8
  ));
 }
-return {ZONES,PROJECTS,POLICIES,create,apply,has,canBuild,restore,forecast,score};
+return {ZONES,PROJECTS,POLICIES,SESSION_PRESETS,create,apply,has,canBuild,restore,forecast,score};
 });
