@@ -1,6 +1,6 @@
 {
   "title": "HELIOS: Venus Initiative",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "fictionDisclaimer": "The classified Soviet colony initiative is fictional alternate history, inspired by documented Venera missions.",
   "scope": {
     "initialPrototype": "Venus",
@@ -139,7 +139,8 @@
   "outcomes": {
     "stableLaboratoryYearsRequired": 3,
     "campaignRequiresInternationalAgreement": true,
-    "missionFailureConsecutiveYears": 2
+    "missionFailureConsecutiveYears": 2,
+    "victoryDescription": "Operate a Venus cloud laboratory for 3 stable periods; campaign also requires international partnership."
   },
   "confidence": "Illustrative game rules. Not physically accurate models of Venus atmosphere, supply windows or orbital mechanics.",
   "fundingChoices": {
@@ -165,5 +166,37 @@
       },
       "label": "Частные инвесторы"
     }
+  },
+  "operations": {
+    "policyOptions": {
+      "conserve": {
+        "supplies": 2,
+        "energy": 1,
+        "science": 3,
+        "wear": 2
+      },
+      "standard": {
+        "supplies": 5,
+        "energy": 3,
+        "science": 8,
+        "wear": 4
+      },
+      "intensive": {
+        "supplies": 8,
+        "energy": 5,
+        "science": 13,
+        "wear": 8
+      }
+    },
+    "defaultPolicy": "standard",
+    "conditionMax": 100,
+    "repair": {
+      "cost": {
+        "credits": 12,
+        "supplies": 7
+      },
+      "restoredCondition": 35
+    },
+    "stepIntervalNote": "Currently one abstract game year; not a validated Earth–Venus flight time."
   }
 }
