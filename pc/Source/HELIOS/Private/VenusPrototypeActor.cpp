@@ -1,4 +1,6 @@
 #include "VenusPrototypeActor.h"
+#include "VenusMissionSubsystem.h"
+#include "Engine/GameInstance.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PointLightComponent.h"
@@ -42,4 +44,38 @@ void AVenusPrototypeActor::OnConstruction(const FTransform& Transform)
     Relay->SetRelativeScale3D(FVector(0.22f));
     Relay->SetRelativeLocation(FVector(Radius + 260.f, 0.f, 80.f));
     Sunlight->SetRelativeLocation(FVector(-Radius * 2.f, Radius, Radius));
+}
+
+void AVenusPrototypeActor::BeginPlay()
+{
+    Super::BeginPlay();
+    if (UGameInstance* Instance = GetGameInstance())
+    {
+        if (UVenusMissionSubsystem* Mission = Instance->GetSubsystem<UVenusMissionSubsystem>())
+        {
+            Mission->OnStateChanged.AddDynamic(this, &AVenusPrototypeActor::RefreshVisualState);
+        }
+    }
+    RefreshVisualState();
+}
+
+void AVenusPrototypeActor::RefreshVisualState()
+{
+    UGameInstance* Instance = GetGameInstance();
+    UVenusMissionSubsystem* Mission = Instance ? Instance->GetSubsystem<UVenusMissionSubsystem>() : nullptr;
+    if (!Mission) return;
+
+    const FVenusMissionState Snapshot = Mission->GetState();
+    const bool bAerostat = Snapshot.CompletedProjects.Contains(TEXT("aerostat"));
+    const bool bRelay = Snapshot.CompletedProjects.Contains(TEXT("relay"));
+
+    Aerostat->SetVisibility(bAerostat, true);
+    Relay->SetVisibility(bRelay, true);
+
+    if (bAerostat)
+    {
+        // Simple physical health cue; material swapping comes in a later scene pass.
+        const float Integrity = FMath::Clamp(Snapshot.AerostatCondition / 100.f, 0.0f, 1.0f);
+        Aerostat->SetRelativeScale3D(FVector(0.25f + 0.12f * Integrity));
+    }
 }
