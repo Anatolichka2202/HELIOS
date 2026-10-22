@@ -1,10 +1,10 @@
 {
   "name": "helios-venus-lite",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "HELIOS Venus campaign and session prototype",
   "scripts": {
-    "check": "node --check engine.js && node --check game.js",
+    "check": "node --check engine.js && node --check game.js && node --check sw.js",
     "test": "node --test tests/*.test.cjs",
     "start": "python3 -m http.server 8080"
   }
