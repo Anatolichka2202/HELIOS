@@ -241,3 +241,23 @@ test("malformed construction queues are rejected without corrupting saved games"
  const broken2={...good,prototype:"true"};
  assert.equal(E.restore(JSON.stringify(broken2)),null);
 });
+
+test("Venus campaign endings reflect distinct successful engineering strategies",()=>{
+ const base={...E.create(),finished:true,outcome:"victory",design:"shield",funding:"public",insight:"protect"};
+ assert.equal(E.ending(base).id,"protected-outpost");
+ assert.equal(E.ending({...base,design:"light"}).id,"high-risk-science");
+ assert.equal(E.ending({...base,funding:"private"}).id,"licensed-colony");
+ assert.equal(E.ending({...base,prototype:true,insight:"sample"}).id,"research-breakthrough");
+ assert.equal(E.ending({...base,outcome:"failure"}).id,"lost-expedition");
+ assert.equal(E.ending(E.create()),null);
+});
+test("corrosion breakthrough costs resources and increases long-term score",()=>{
+ let s=campaignToBase();
+ s=move(s,"next").state;
+ s=move(s,"respond","sample").state;
+ const score=E.score(s);
+ const upgraded=move(s,"prototype");
+ assert.equal(upgraded.error,null);
+ assert.ok(upgraded.state.prototype);
+ assert.equal(E.score(upgraded.state)-E.score(s),25-18-40);
+});
