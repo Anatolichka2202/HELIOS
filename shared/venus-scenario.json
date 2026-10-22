@@ -1,6 +1,6 @@
 {
   "title": "HELIOS: Venus Initiative",
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "fictionDisclaimer": "The classified Soviet colony initiative is fictional alternate history, inspired by documented Venera missions.",
   "scope": {
     "initialPrototype": "Venus",
@@ -218,5 +218,75 @@
       "energy": 40,
       "supplies": 55
     }
+  },
+  "liteExperimentalV07": {
+    "status": "Playable Lite gameplay experiment. Not yet implemented in Unity or Unreal. Do not claim binary parity.",
+    "startingDesign": null,
+    "designs": {
+      "shield": {
+        "name": "Защищённая платформа",
+        "extraBuildCost": {
+          "credits": 14,
+          "supplies": 4
+        },
+        "wearAdjustment": -2,
+        "stormDamageAdjustment": -8,
+        "scienceAdjustment": -2
+      },
+      "light": {
+        "name": "Лёгкая научная станция",
+        "extraBuildCost": {
+          "credits": -8,
+          "supplies": -4
+        },
+        "wearAdjustment": 3,
+        "stormDamageAdjustment": 4,
+        "scienceAdjustment": 4
+      },
+      "legacy": {
+        "name": "Старое сохранение",
+        "extraBuildCost": {},
+        "wearAdjustment": 0,
+        "stormDamageAdjustment": 0,
+        "scienceAdjustment": 0
+      }
+    },
+    "constructionDurations": {
+      "aerostat": 1,
+      "lab": 1
+    },
+    "acidFront": {
+      "trigger": "First year of operating cloud lab",
+      "blocking": true,
+      "options": {
+        "sample": {
+          "science": 22,
+          "condition": -16,
+          "unlocks": "acid-resistant prototype"
+        },
+        "protect": {
+          "credits": -14,
+          "supplies": -5,
+          "condition": 10,
+          "stormMitigation": 5
+        },
+        "retreat": {
+          "condition": 5,
+          "resetStableYears": true
+        }
+      }
+    },
+    "acidResistantPrototype": {
+      "requires": "sample",
+      "cost": {
+        "credits": 18,
+        "science": 20,
+        "supplies": 4
+      },
+      "wearMitigation": 3,
+      "stormMitigation": 4
+    },
+    "privateAnnualRoyalties": 6,
+    "publicAnnualScienceBonus": 3
   }
 }
