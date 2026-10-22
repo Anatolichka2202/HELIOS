@@ -3,3 +3,11 @@
 .hero{background-image:linear-gradient(90deg,#091321f7 0%,#0b1729f0 32%,#0b172994 65%,#0715232f 100%),url("assets/venus-clouds.svg");background-position:center,center;background-size:cover,cover}
 .hero-visual{min-height:315px}
 @media(max-width:760px){.hero{background-image:linear-gradient(90deg,#091321f5 0%,#0b1729dc 70%,#0b172991 100%),url("assets/venus-clouds.svg");background-position:center,65% center}.hero-visual{display:none}.hero p{max-width:100%}.hero-content{max-width:100%;background:#09132148}}
+
+.objective-strip{display:flex;justify-content:space-between;align-items:center;gap:20px;background:linear-gradient(100deg,#203747,#1e263a);border:1px solid #5f8390;border-radius:15px;padding:17px 22px;margin:15px 0}
+.objective-strip h2{font-size:21px;margin:3px 0 3px}
+.objective-strip p{color:#b5c9d8;font-size:12px;margin:0;line-height:1.55}
+.objective-button{flex-shrink:0;background:#1a4e58;border-color:#6ac4cb}
+.choices{display:grid;gap:9px}
+.choice{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:760px){.objective-strip{padding:15px;gap:12px;align-items:stretch;flex-direction:column}.objective-button{width:100%}.objective-strip h2{font-size:18px}}
