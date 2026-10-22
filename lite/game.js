@@ -76,6 +76,9 @@ function drawStory(){
       game.insight==="protect"?"защита станции":game.insight==="retreat"?"остановка экспериментов":"без исследовательского кризиса")+
       (game.prototype?" · создано кислотостойкое покрытие":"")));
   actions.append(details,element("p","subtle","Попробуйте другую конструкцию, финансирование или научную тактику — последствия изменятся."));
+  const continueUniverse=element("a","ecosystem-jump","Какие ещё истории есть во вселенной HELIOS →");
+  continueUniverse.href="#helios-universe";
+  actions.append(continueUniverse);
  }else if(game.mode==="session"){
   title.textContent="Свободная венерианская сессия";
   copy.textContent="Режим: "+Engine.SESSION_PRESETS[game.preset||"standard"].name+". Постройте облачную лабораторию и обеспечьте три года устойчивой работы. Снабжение доставляется с Земли.";
@@ -220,6 +223,41 @@ function drawOperations(){
    "Режимы откроются после запуска аэростата.";
 }
 
+function renderEcosystem(){
+ const config=globalThis.HeliosEcosystem;
+ if(!config)return;
+ const root=$("ecosystem-products"),offers=$("ecosystem-offers");
+ clear(root);clear(offers);offers.hidden=true;
+ for(const product of config.products){
+   const card=element("article","ecosystem-card ecosystem-"+product.id);
+   const header=element("div","ecosystem-card-head");
+   header.append(element("span","ecosystem-category",product.kind),
+     element("strong","ecosystem-availability",
+       product.availability==="playable"?"ДОСТУПНАЯ ИГРА":
+       product.availability==="released"?"ВЫШЛА":"В РАЗРАБОТКЕ"));
+   card.append(header,element("h3","",product.title),element("p","",product.pitch));
+   if(config.isReleased(product)){
+     const link=element("a","ecosystem-link",product.action||"Открыть продукт");
+     link.href=product.url;link.target="_blank";link.rel="noopener noreferrer";
+     card.append(link);
+   }else{
+     card.append(element("span","ecosystem-promise",
+       product.id==="lite"?"Вы сейчас играете в эту историю.":"Другой сюжет и масштаб, а не повторение этой кампании."));
+   }
+   root.append(card);
+ }
+ for(const [kind,offer,description] of [
+   ["support",config.support,"Добровольная поддержка создания новых эпизодов. Без игровых преимуществ."],
+   ["chapter",config.paidEpisodes,"Отдельная законченная браузерная история, а не недостающий финал текущей."]
+ ]){
+   if(!config.hasPublishedLink(offer))continue;
+   const segment=element("div","ecosystem-offer ecosystem-offer-"+kind);
+   segment.append(element("p","",description));
+   const link=element("a","ecosystem-link",offer.action);
+   link.href=offer.url;link.target="_blank";link.rel="noopener noreferrer";
+   segment.append(link);offers.append(segment);offers.hidden=false;
+ }
+}
 function render(){
  const zone=Engine.ZONES.find(z=>z.id===game.selected);
  $("year").textContent=game.year;$("credits").textContent=game.credits;$("science").textContent=game.science;
@@ -293,4 +331,5 @@ if(typeof navigator!=="undefined"&&"serviceWorker" in navigator&&location.protoc
  navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 
+renderEcosystem();
 render();
