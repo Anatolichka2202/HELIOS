@@ -6,10 +6,11 @@ let stored=null;
 try{stored=localStorage.getItem("helios-venus-v4");}catch{}
 let game=Engine.restore(stored)||Engine.create();
 let feedback="";
+function persist(){try{localStorage.setItem("helios-venus-v4",JSON.stringify(game));return true;}catch{return false;}}
 function listCost(cost){return Object.entries(cost).map(([k,v])=>v+" "+labels[k]).join(" · ");}
 function change(command){
   const result=Engine.apply(game,command);
-  if(result.error){feedback=result.error;}else{game=result.state;feedback="Операция выполнена.";}
+  if(result.error){feedback=result.error;}else{game=result.state;feedback="Операция выполнена.";persist();}
   render();
 }
 function clear(n){n.replaceChildren();}
@@ -101,11 +102,11 @@ function render(){
 function switchMode(mode){
  if(game.mode===mode)return;
  if(!confirm("Начать новую "+(mode==="campaign"?"кампанию":"сессию")+"? Текущий прогресс будет потерян."))return;
- game=Engine.create(mode);feedback="Начата новая игра.";render();
+ game=Engine.create(mode);persist();feedback="Начата новая игра.";render();
 }
 $("next").addEventListener("click",()=>change({type:"next"}));
 $("campaign").addEventListener("click",()=>switchMode("campaign"));
 $("session").addEventListener("click",()=>switchMode("session"));
-$("save").addEventListener("click",()=>{try{localStorage.setItem("helios-venus-v4",JSON.stringify(game));feedback="Прогресс сохранён на этом устройстве.";}catch{feedback="Браузер не разрешил сохранить игру.";}render();});
-$("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;game=Engine.create(game.mode);feedback="Начата новая игра.";render();});
+$("save").addEventListener("click",()=>{feedback=persist()?"Прогресс сохранён на этом устройстве.":"Браузер не разрешил сохранить игру.";render();});
+$("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;game=Engine.create(game.mode);persist();feedback="Начата новая игра.";render();});
 render();
