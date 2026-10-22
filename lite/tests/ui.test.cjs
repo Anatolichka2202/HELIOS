@@ -115,8 +115,14 @@ test("policy selector becomes available after aerostat construction",()=>{
  app.get("layers").children[0].click();
  app.get("projects").children[1].children.at(-1).click(); // relay
  app.get("story-actions").children[0].click(); // treaty
+ assert.equal(app.get("decision-card").hidden,false);
+ assert.equal(app.get("decision-options").children.length,2);
+ app.get("decision-options").children[0].click(); // shield design
  app.get("layers").children[1].click();
- app.get("projects").children[1].children.at(-1).click(); // aerostat
+ app.get("projects").children[1].children.at(-1).click(); // aerostat queue
+ assert.equal(app.get("scene-stage").textContent,"МОНТАЖ");
+ assert.equal(app.get("policy-buttons").children[2].disabled,true);
+ app.get("next").click(); // commission
  assert.equal(app.get("scene-stage").textContent,"АЭРОСТАТ");
  assert.equal(app.get("policy-buttons").children[2].disabled,false);
  app.get("policy-buttons").children[2].click();
@@ -153,4 +159,41 @@ test("operations forecast exposes a dedicated resource-warning message",()=>{
  const app=mount();
  assert.equal(app.get("forecast-alert").textContent,"");
  assert.ok(app.get("policy-buttons").children.length===3);
+});
+
+test("player chooses a different engineering design and sees its higher cost",()=>{
+ const app=mount();
+ app.get("session").click();
+ app.get("projects").children[0].children.at(-1).click();
+ app.get("layers").children[1].click();
+ app.get("projects").children[0].children.at(-1).click();
+ app.get("layers").children[0].click();
+ app.get("projects").children[1].children.at(-1).click();
+ assert.equal(app.get("decision-options").children.length,2);
+ app.get("decision-options").children[1].click();
+ const s=JSON.parse(app.store.get("helios-venus-v4"));
+ assert.equal(s.design,"light");
+ app.get("layers").children[1].click();
+ assert.ok(app.get("projects").children[1].children[2].textContent.includes("32 бюджет"));
+});
+test("acid front is visible and next year is blocked until a crisis choice",()=>{
+ const app=mount();
+ app.get("session-preset").value="funded";
+ app.get("session").click();
+ const build=(index=0)=>app.get("projects").children[index].children.at(-1).click();
+ build(); // archive
+ app.get("layers").children[1].click();build(); // probe
+ app.get("layers").children[0].click();build(1); // relay
+ app.get("decision-options").children[0].click(); // reinforced
+ app.get("layers").children[1].click();build(1); // aerostat started
+ app.get("next").click(); // commissioned
+ app.get("layers").children[0].click();build(2); // logistics
+ app.get("layers").children[1].click();build(2); // lab started
+ app.get("next").click(); // lab completed
+ app.get("next").click(); // first year triggers event
+ assert.equal(app.get("decision-card").hidden,false);
+ assert.ok(app.get("decision-title").textContent.includes("Кислотный"));
+ assert.equal(app.get("next").disabled,true);
+ app.get("decision-options").children[1].click(); // reinforce, if enough supplies
+ assert.equal(app.get("next").disabled,false);
 });
