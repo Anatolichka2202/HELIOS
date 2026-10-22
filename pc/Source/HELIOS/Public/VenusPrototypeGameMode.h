@@ -13,4 +13,6 @@ public:
     AVenusPrototypeGameMode();
 protected:
     virtual void BeginPlay() override;
+private:
+    void PositionPreviewCamera();
 };
