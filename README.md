@@ -8,7 +8,7 @@ Multi-platform strategy project about human expansion across the **entire Solar 
 
 **[Документы HELIOS: общий замысел + три спецификации + игровая и коммерческая экономика](design/00_INDEX.md)**
 
-**[Код для новичка: где что лежит и как работает](docs/START_HERE.md)** · **[Реализовано в 0.6](docs/IMPLEMENTATION_0_6.md)**
+**[Код для новичка: где что лежит и как работает](docs/START_HERE.md)** · **[Плейтест Venus 0.7](docs/PLAYTEST_VENUS_0_7.md)** · **[Предыдущая поставка 0.6](docs/IMPLEMENTATION_0_6.md)**
 
 **[Полная карта кода](docs/CODEBASE_MAP.md)** · **[Технический аудит](docs/TECHNICAL_AUDIT.md)**
 
@@ -21,11 +21,11 @@ These are **product specifications, not claims of implemented features**. See th
 
 | Directory | Purpose | Current status |
 |---|---|---|
-| [lite/](lite/) | Browser Venus Initiative | Venus 0.6 source, production/tradeoff loop, PWA/cache, backup saves; real iPhone test pending |
+| [lite/](lite/) | Browser Venus Initiative | Venus 0.7 source, production/tradeoff loop, PWA/cache, backup saves; real iPhone test pending |
 | [pc/](pc/) | Unreal Engine 5 / C++ flagship | UE mission subsystem, keyboard prototype, 3D scene + in-world console; build unverified |
 | [mobile/](mobile/) | Unity / C# for Android/iOS | Venus scene preview and mission catalog; device builds unverified |
 | [core/](core/) | C++ simulation research prototype | CMake and smoke test |
-| [shared/](shared/) | Cross-platform data contracts | Venus schema v4; static ID contract across clients, not yet runtime-integrated |
+| [shared/](shared/) | Cross-platform data contracts | Venus schema v5; Lite 0.7 experimental mechanics documented; static ID contract across clients, not yet runtime-integrated |
 | [design/](design/) | Narrative, architecture, roadmap and business assumptions | Venus campaign and long-term franchise |
 
 ## Run Lite locally
@@ -55,3 +55,9 @@ A fictional classified Soviet Venus initiative leaves an archive in Russia. A br
 - GitHub repository visibility is currently **public**; do not commit credentials or employer source.
 
 See [Venus campaign](design/VENUS_CAMPAIGN.md), [Venus acceptance criteria](design/VENUS_VERTICAL_SLICE.md), [Roadmap](design/ROADMAP.md), and [issues](https://github.com/Anatolichka2202/HELIOS/issues).
+
+## Venus 0.7 gameplay update
+
+The browser prototype now includes two distinct aerostat engineering designs, staggered commissioning of major facilities, a consequential acid-front crisis, unlockable corrosion-resistant materials, energy/supply-dependent mission viability and different campaign epilogues. The Lite simulation and schema/UI smoke suite contains **61 tests** that passed in a controlled JS harness. These are **not measured retention metrics** or verified native mobile/PC builds.
+
+[Playtest on phone and report whether it's actually fun](docs/PLAYTEST_VENUS_0_7.md). The prior `mobile/` Unity and `pc/` Unreal sources remain a separate, older vertical slice and are not yet at Lite 0.7 rules parity.
