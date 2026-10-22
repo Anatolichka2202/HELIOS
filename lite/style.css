@@ -79,3 +79,7 @@ header{flex-wrap:wrap}
 .stage-object.building{opacity:.4;filter:grayscale(.55) drop-shadow(0 0 6px #f1d6a0)}
 @media(max-width:760px){.decision-card{padding:15px}.decision-header h2{font-size:20px}.decision-card p{font-size:13px}.decision-options{grid-template-columns:1fr}.decision-choice{min-height:84px}}
 @media(prefers-reduced-motion:reduce){.decision-choice{transition:none}}
+
+.project.technology{border-color:#80bcb3;background:linear-gradient(150deg,#163745,#25344c)}
+#visual-aerostat.prototype{filter:drop-shadow(0 0 11px #80e2ce)}
+.decision-card:focus-within{outline:1px solid #e4c497;outline-offset:3px}
