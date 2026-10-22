@@ -56,3 +56,5 @@ header{flex-wrap:wrap}
  .head-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
  .head-actions button{font-size:10px;padding:8px 3px;min-height:44px;white-space:normal;line-height:1.2}
 }
+
+.preset-label{display:block;color:#c0d5df;font-size:11px;margin-top:12px;line-height:1.6}.preset-label select{display:block;max-width:310px;width:100%;font:inherit;font-size:13px;color:#f2e2c6;background:#23384c;border:1px solid #7493a5;border-radius:9px;padding:9px 12px;margin-top:5px;min-height:40px}.preset-label select:focus-visible{outline:2px solid #7dd5dc;outline-offset:3px}@media(max-width:760px){.preset-label{max-width:82%}}
