@@ -60,7 +60,7 @@ function drawStory(){
   actions.append(element("p","subtle","Итог: "+(game.outcome==="failure"?"миссия сорвана":"экспедиция завершена")+" · оценка "+Engine.score(game)+" · новая игра доступна сверху."));
  }else if(game.mode==="session"){
   title.textContent="Свободная венерианская сессия";
-  copy.textContent="Задача: построить облачную лабораторию и обеспечить три года устойчивой работы платформы. Снабжение доставляется с Земли по открытой грузовой программе.";
+  copy.textContent="Режим: "+Engine.SESSION_PRESETS[game.preset||"standard"].name+". Постройте облачную лабораторию и обеспечьте три года устойчивой работы. Снабжение доставляется с Земли.";
   actions.append(element("p","subtle","История не ограничивает строительство, но инженерные требования сохраняются."));
  }else if(game.storyStep===0){
   title.textContent="Досье, которого не существовало";
@@ -164,6 +164,7 @@ function render(){
  $("turn").textContent="ХОД "+game.turn;
  $("campaign").classList.toggle("selected",game.mode==="campaign");
  $("session").classList.toggle("selected",game.mode==="session");
+ if(game.mode==="session")$("session-preset").value=game.preset||"standard";
  $("next").disabled=game.finished;
  $("next").querySelector("span").textContent=game.finished?"✓":"→";
  drawZones();drawProjects();drawStory();drawObjective();drawOperations();
@@ -171,9 +172,10 @@ function render(){
  $("message").textContent=feedback;
 }
 function switchMode(mode){
- if(game.mode===mode)return;
+ const preset=$("session-preset").value;
+ if(game.mode===mode&&(mode!=="session"||game.preset===preset))return;
  if(!confirm("Начать новую "+(mode==="campaign"?"кампанию":"сессию")+"? Текущий прогресс будет потерян."))return;
- game=Engine.create(mode);persist();feedback="Начата новая игра.";render();
+ game=Engine.create(mode,preset);persist();feedback="Начата новая игра.";render();
 }
 $("next").addEventListener("click",()=>change({type:"next"}));
 $("focus-goal").addEventListener("click",()=>{
