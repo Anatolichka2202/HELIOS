@@ -139,3 +139,12 @@ test("compatible save file can be imported while invalid JSON is refused",async(
  assert.equal(app.get("year").textContent,2034);
  assert.ok(app.get("message").textContent.includes("совместимым"));
 });
+
+test("session challenge selector changes initial resources",()=>{
+ const app=mount();
+ app.get("session-preset").value="constrained";
+ app.get("session").click();
+ assert.equal(app.get("credits").textContent,120);
+ assert.equal(app.get("supplies").textContent,20);
+ assert.equal(app.get("session-preset").value,"constrained");
+});
