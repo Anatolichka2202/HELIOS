@@ -194,3 +194,50 @@ test("old version four saves receive a legacy design instead of corrupting a bui
  assert.ok(E.has(restored,"aerostat"));
  assert.equal(restored.buildQueue.length,0);
 });
+
+test("risky sampling unlocks corrosion coating with actual maintenance benefit",()=>{
+ let s=campaignToBase();
+ s=move(s,"next").state;
+ assert.equal(s.event,"acid-front");
+ s=move(s,"respond","sample").state;
+ const before={...s};
+ const unavailable=move({...before,insight:"protect"},"prototype");
+ assert.ok(unavailable.error);
+ const applied=move(s,"prototype");
+ assert.equal(applied.error,null);
+ s=applied.state;
+ assert.equal(s.prototype,true);
+ assert.equal(s.credits,before.credits-18);
+ assert.equal(s.science,before.science-20);
+ assert.equal(s.supplies,before.supplies-4);
+ const protectedForecast=E.forecast(s);
+ const rawForecast=E.forecast({...s,prototype:false});
+ assert.ok(protectedForecast.predictedCondition>rawForecast.predictedCondition);
+ assert.ok(move(s,"prototype").error);
+});
+test("retreat from acid front preserves crew and sacrifices consecutive research years",()=>{
+ let s=campaignToBase();
+ s=move(s,"next").state;
+ assert.equal(s.consecutiveYears,1);
+ const before=s.condition;
+ s=move(s,"respond","retreat").state;
+ assert.equal(s.consecutiveYears,0);
+ assert.equal(s.insight,"retreat");
+ assert.ok(s.condition>=before);
+ assert.equal(s.event,null);
+});
+test("public science exchange vs private licence obligations affect future cycles",()=>{
+ const base=campaignToBase();
+ const p=move(base,"next").state;
+ const privateBase={...base,funding:"private"};
+ const q=move(privateBase,"next").state;
+ assert.equal(p.credits-base.credits,(q.credits-privateBase.credits)+6);
+ assert.equal(p.science-base.science,(q.science-privateBase.science)+3);
+});
+test("malformed construction queues are rejected without corrupting saved games",()=>{
+ const good=campaignToBase();
+ const broken={...good,buildQueue:[{id:"unknown",ready:3}]};
+ assert.equal(E.restore(JSON.stringify(broken)),null);
+ const broken2={...good,prototype:"true"};
+ assert.equal(E.restore(JSON.stringify(broken2)),null);
+});
