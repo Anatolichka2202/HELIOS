@@ -5,7 +5,7 @@ const E=require("../engine.js");
 const move=(state,type,id)=>E.apply(state,{type,id});
 function campaignToBase(){
  let s=E.create();
- for(const [type,id] of [["council"],["funding","public"],["build","archive"],["build","probe"],["build","relay"],["treaty"],["build","aerostat"],["build","logistics"],["build","lab"]]){
+ for(const [type,id] of [["council"],["funding","public"],["build","archive"],["build","probe"],["build","relay"],["treaty"],["design","shield"],["build","aerostat"],["next"],["build","logistics"],["build","lab"],["next"]]){
   const r=move(s,type,id);assert.equal(r.error,null,JSON.stringify({type,id,error:r.error}));s=r.state;
  }
  return s;
@@ -15,10 +15,10 @@ test("transitions are immutable",()=>{const first=E.create();const result=move(f
 test("unlock prerequisites are enforced",()=>{const s=E.create();assert.equal(E.canBuild(s,"aerostat"),false);assert.equal(move(s,"build","aerostat").error!==null,true);});
 test("cannot make an international treaty before probe and relay",()=>{let s=move(E.create(),"council").state;assert.ok(move(s,"treaty").error);});
 test("complete campaign construction loop",()=>{const s=campaignToBase();assert.ok(E.has(s,"lab"));assert.ok(s.international);assert.equal(s.condition,100);assert.ok(s.credits>=0);});
-test("lab earns science only while platform operating",()=>{let s=campaignToBase();const start=s.science;s=move(s,"next").state;assert.ok(s.science>=start+8);s={...s,condition:0};const after=s.science;s=move(s,"next").state;assert.equal(s.science-after,5);});
-test("transport has a two-turn delivery delay",()=>{let s=campaignToBase();const first=s.supplies;let r=move(s,"shipment");assert.equal(r.error,null);s=r.state;assert.equal(s.shipments[0].arrival,s.turn+2);s=move(s,"next").state;assert.ok(s.supplies<first);s=move(s,"next").state;assert.equal(s.shipments.length,0);assert.ok(s.supplies>=first);});
+test("lab earns science only while platform operating",()=>{let s=campaignToBase();const start=s.science;s=move(s,"next").state;assert.ok(s.science>=start+8);s=move(s,"respond","sample").state;s={...s,condition:0};const after=s.science;s=move(s,"next").state;assert.equal(s.science-after,8);});
+test("transport has a two-turn delivery delay",()=>{let s=campaignToBase();const first=s.supplies;let r=move(s,"shipment");assert.equal(r.error,null);s=r.state;assert.equal(s.shipments[0].arrival,s.turn+2);s=move(s,"next").state;assert.ok(s.supplies<first);s=move(s,"respond","protect").state;s=move(s,"next").state;assert.equal(s.shipments.length,0);assert.ok(s.supplies>=first);});
 test("aerostat condition decays and can be repaired",()=>{let s=campaignToBase();s=move(s,"next").state;assert.ok(s.condition<100);const before=s.condition;s=move(s,"repair").state;assert.ok(s.condition>before);});
-test("campaign victory requires three stable years",()=>{let s=campaignToBase();for(let i=0;i<2;i++)s=move(s,"next").state;assert.equal(s.finished,false);s=move(s,"next").state;assert.equal(s.finished,true);assert.ok(move(s,"next").error);});
+test("campaign victory requires three stable years",()=>{let s=campaignToBase();s=move(s,"next").state;assert.equal(s.finished,false);assert.equal(s.event,"acid-front");s=move(s,"respond","protect").state;for(let i=0;i<2;i++)s=move(s,"next").state;assert.equal(s.finished,true);assert.ok(move(s,"next").error);});
 test("out-of-supply platform degrades faster",()=>{let s=campaignToBase();s={...s,supplies:0,energy:0};const after=move(s,"next").state;assert.ok(after.condition<=78);});
 test("valid saves restore and malformed saves are rejected",()=>{const s=campaignToBase();assert.deepEqual(E.restore(JSON.stringify(s)),s);assert.equal(E.restore("not json"),null);assert.equal(E.restore('{"version":0}'),null);});
 test("unknown actions and zones are rejected",()=>{const s=E.create();assert.ok(move(s,"nonsense").error);assert.ok(move(s,"select","pluto").error);});
@@ -46,6 +46,7 @@ test("aerostat lost for two consecutive years ends the mission in failure",()=>{
   let s=campaignToBase();s={...s,condition:0,supplies:0,energy:0};
   s=E.apply(s,{type:"next"}).state;
   assert.equal(s.finished,false);
+  s=E.apply(s,{type:"respond",id:"sample"}).state;
   s=E.apply(s,{type:"next"}).state;
   assert.equal(s.finished,true);
   assert.equal(s.outcome,"failure");
@@ -77,7 +78,7 @@ test("forecast reflects chosen policy and queued shipments",()=>{
  s=move(s,"policy","conserve").state;
  const first=E.forecast(s);
  assert.equal(first.maintenance,2);
- assert.equal(first.science,8);
+ assert.equal(first.science,9);
  s=move(s,"shipment").state;
  assert.equal(E.forecast(s).incoming,0);
  s=move(s,"next").state;
@@ -94,7 +95,7 @@ test("older save restores default work policy and forecast fields",()=>{
 });
 test("game score rewards stable successful mission",()=>{
  let s=campaignToBase();
- s=move(s,"next").state;s=move(s,"next").state;s=move(s,"next").state;
+ s=move(s,"next").state;s=move(s,"respond","protect").state;s=move(s,"next").state;s=move(s,"next").state;
  assert.equal(s.outcome,"victory");
  assert.ok(E.score(s)>300);
 });
@@ -126,4 +127,70 @@ test("forecast detects known energy shortage before future damage",()=>{
  assert.equal(f.predictedCondition,58);
  assert.equal(f.supplies,0);
  assert.ok(E.apply(s,{type:"next"}).state.condition<=58);
+});
+
+test("aerostat construction consumes resources and requires a commissioning period",()=>{
+ let s=E.create("session");
+ for(const [type,id] of [["build","archive"],["build","probe"],["build","relay"],["design","light"]]){
+  const r=move(s,type,id);assert.equal(r.error,null);s=r.state;
+ }
+ const credit=s.credits;
+ const a=move(s,"build","aerostat");assert.equal(a.error,null);s=a.state;
+ assert.equal(s.credits,credit-E.projectCost(s,"aerostat").credits);
+ assert.equal(E.has(s,"aerostat"),false);
+ assert.equal(s.buildQueue.length,1);
+ assert.ok(move(s,"build","aerostat").error);
+ s=move(s,"next").state;
+ assert.equal(E.has(s,"aerostat"),true);
+ assert.equal(s.condition,100);
+ assert.equal(s.buildQueue.length,0);
+});
+test("shield vs light produce genuinely different construction costs and storm exposure",()=>{
+ const base=E.create();
+ assert.equal(E.projectCost(base,"aerostat").credits,40);
+ assert.equal(E.projectCost({...base,design:"shield"},"aerostat").credits,54);
+ assert.equal(E.projectCost({...base,design:"light"},"aerostat").credits,32);
+ let shield=campaignToBase();
+ let light={...shield,design:"light"};
+ shield=move(shield,"next").state;
+ light=move(light,"next").state;
+ assert.ok(shield.condition>light.condition);
+ assert.ok(shield.science<light.science);
+});
+test("acid-front event blocks time until a real decision is made",()=>{
+ let s=campaignToBase();
+ s=move(s,"next").state;
+ assert.equal(s.event,"acid-front");
+ const before=JSON.stringify(s);
+ const blocked=move(s,"next");
+ assert.ok(blocked.error);
+ assert.equal(JSON.stringify(s),before);
+ assert.ok(move(s,"respond","other").error);
+ s=move(s,"respond","sample").state;
+ assert.equal(s.event,null);
+ assert.equal(s.eventResolved,true);
+ assert.equal(s.insight,"sample");
+ assert.ok(move(s,"next").error===null);
+});
+test("protecting station changes future storm damage while requiring budget and supplies",()=>{
+ let s=campaignToBase();
+ s=move(s,"next").state;
+ const before=s.condition;
+ const p=move(s,"respond","protect");
+ assert.equal(p.error,null);
+ assert.equal(p.state.credits,s.credits-14);
+ assert.equal(p.state.supplies,s.supplies-5);
+ assert.ok(p.state.condition>=before);
+ const broke={...s,credits:0};
+ const rejected=move(broke,"respond","protect");
+ assert.ok(rejected.error);
+ assert.equal(broke.credits,0);
+});
+test("old version four saves receive a legacy design instead of corrupting a built station",()=>{
+ const s=campaignToBase(),original={...s};
+ delete original.design;delete original.buildQueue;delete original.event;delete original.eventResolved;delete original.insight;
+ const restored=E.restore(JSON.stringify(original));
+ assert.equal(restored.design,"legacy");
+ assert.ok(E.has(restored,"aerostat"));
+ assert.equal(restored.buildQueue.length,0);
 });
