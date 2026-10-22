@@ -98,3 +98,22 @@ test("game score rewards stable successful mission",()=>{
  assert.equal(s.outcome,"victory");
  assert.ok(E.score(s)>300);
 });
+
+test("session challenge presets have distinct budgets without affecting campaign",()=>{
+ const standard=E.create("session");
+ const constrained=E.create("session","constrained");
+ const funded=E.create("session","funded");
+ assert.equal(standard.credits,170);
+ assert.equal(constrained.credits,120);
+ assert.equal(constrained.supplies,20);
+ assert.equal(funded.credits,250);
+ assert.equal(funded.science,60);
+ assert.equal(E.create("campaign","funded").credits,125);
+ assert.throws(()=>E.create("session","invalid"));
+});
+test("session preset survives browser save and restore",()=>{
+ const state=E.create("session","constrained");
+ const restored=E.restore(JSON.stringify(state));
+ assert.equal(restored.preset,"constrained");
+ assert.equal(restored.credits,120);
+});
