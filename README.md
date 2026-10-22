@@ -6,6 +6,8 @@ Multi-platform strategy project about human expansion across the **entire Solar 
 
 ## Start here — concept, architecture and what the code really does
 
+**[Новая стратегия франшизы v0.4: Lite зарабатывает, Mobile и PC предлагают разные игры](design/11_FRANCHISE_PRODUCT_STRATEGY.md)**
+
 **[Документы HELIOS: общий замысел + три спецификации + игровая и коммерческая экономика](design/00_INDEX.md)**
 
 **[Код для новичка: где что лежит и как работает](docs/START_HERE.md)** · **[Плейтест Venus 0.7](docs/PLAYTEST_VENUS_0_7.md)** · **[Предыдущая поставка 0.6](docs/IMPLEMENTATION_0_6.md)**
