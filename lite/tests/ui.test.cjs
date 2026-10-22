@@ -148,3 +148,9 @@ test("session challenge selector changes initial resources",()=>{
  assert.equal(app.get("supplies").textContent,20);
  assert.equal(app.get("session-preset").value,"constrained");
 });
+
+test("operations forecast exposes a dedicated resource-warning message",()=>{
+ const app=mount();
+ assert.equal(app.get("forecast-alert").textContent,"");
+ assert.ok(app.get("policy-buttons").children.length===3);
+});
