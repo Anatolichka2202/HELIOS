@@ -1,6 +1,6 @@
 # HELIOS — карта кодовой базы
 
-Статус: инвентаризация обновлена 23.10.2026, после Venus 0.6. Основная ветка `main`, репозиторий `Anatolichka2202/HELIOS`.
+Статус: инвентаризация обновлена 23.10.2026, после Venus 0.7. Основная ветка `main`, репозиторий `Anatolichka2202/HELIOS`.
 
 ## Цель и границы
 
@@ -87,3 +87,9 @@ cd archive/p1-python && python -m unittest discover -s tests -v
 ```
 
 GitHub Pages: `Settings → Pages → Build and deployment → GitHub Actions`; реальный мобильный тест проводится после успешной публикации.
+
+## Дополнение: Lite 0.7 vs native
+
+Version 0.7 is **implemented in the browser only**: `lite/engine.js` owns new dynamic aerostat construction costs, scheduled commissioning, pending acid-front choices, novel chemistry prototype, and different endings. `shared/venus-scenario.json` version 5 records it under `liteExperimentalV07` explicitly to prevent false native parity. `mobile/VenusSessionModel.cs` and `pc/VenusMissionSubsystem.cpp` retain their earlier implementation and must not be described as already supporting these new mechanics.
+
+Player-facing QA and routes: [Venus playtest v0.7](PLAYTEST_VENUS_0_7.md).
