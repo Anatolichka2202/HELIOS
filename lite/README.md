@@ -1,4 +1,4 @@
-# HELIOS Lite — Venus Initiative (0.7)
+# HELIOS Lite — Venus Initiative (0.7.1)
 
 The first playable vertical slice is **Venus**. The planned franchise remains Solar System-wide.
 
