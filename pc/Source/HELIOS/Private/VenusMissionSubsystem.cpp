@@ -50,9 +50,9 @@ bool UVenusMissionSubsystem::HoldScientificCouncil()
 bool UVenusMissionSubsystem::ChooseFunding(FName Plan)
 {
     if (!State.bCampaign || State.StoryStep != 1 || !State.Funding.IsNone() ||
-        State.bFinished || (Plan != TEXT("public") && Plan != TEXT("private")))
+        State.bFinished || (Plan != FName(TEXT("public")) && Plan != FName(TEXT("private"))))
         return Reject(TEXT("Недоступное решение о финансировании."));
-    if (Plan == TEXT("public"))
+    if (Plan == FName(TEXT("public")))
     {
         if (State.Credits < 8) return Reject(TEXT("Не хватает 8 бюджетных единиц."));
         State.Credits -= 8;
@@ -70,13 +70,13 @@ bool UVenusMissionSubsystem::ChooseFunding(FName Plan)
 bool UVenusMissionSubsystem::SignInternationalTreaty()
 {
     if (!State.bCampaign || State.StoryStep != 1 || State.Funding.IsNone() ||
-        !HasProject(TEXT("probe")) || !HasProject(TEXT("relay")) || State.bFinished)
+        !HasProject(FName(TEXT("probe"))) || !HasProject(FName(TEXT("relay"))) || State.bFinished)
         return Reject(TEXT("Необходимы финансирование, зонд и ретранслятор."));
 
     State.StoryStep = 2;
     State.bInternational = true;
-    State.Credits += State.Funding == TEXT("public") ? 65 : 45;
-    State.Supplies += State.Funding == TEXT("public") ? 20 : 8;
+    State.Credits += State.Funding == FName(TEXT("public")) ? 65 : 45;
+    State.Supplies += State.Funding == FName(TEXT("public")) ? 20 : 8;
     return Accept(TEXT("Международный венерианский консорциум создан."));
 }
 
@@ -88,14 +88,14 @@ bool UVenusMissionSubsystem::TryBuildProject(FName ProjectId)
     int32 NeedCredits = 0, NeedScience = 0, NeedEnergy = 0, NeedSupplies = 0;
     TArray<FName> Requires;
 
-    if (ProjectId == TEXT("archive")) { NeedCredits = 12; }
-    else if (ProjectId == TEXT("probe")) { NeedCredits = 24; NeedScience = 6; Requires = { TEXT("archive") }; }
-    else if (ProjectId == TEXT("relay")) { NeedCredits = 18; NeedEnergy = 4; Requires = { TEXT("archive") }; }
-    else if (ProjectId == TEXT("aerostat")) { NeedCredits = 40; NeedScience = 12; NeedSupplies = 12; Requires = { TEXT("probe"), TEXT("relay") }; }
-    else if (ProjectId == TEXT("logistics")) { NeedCredits = 28; NeedEnergy = 6; Requires = { TEXT("relay") }; }
-    else if (ProjectId == TEXT("lab")) { NeedCredits = 34; NeedScience = 12; NeedSupplies = 6; Requires = { TEXT("aerostat"), TEXT("logistics") }; }
-    else if (ProjectId == TEXT("descent")) { NeedCredits = 25; NeedScience = 10; Requires = { TEXT("probe") }; }
-    else if (ProjectId == TEXT("lander")) { NeedCredits = 32; NeedScience = 15; Requires = { TEXT("descent"), TEXT("relay") }; }
+    if (ProjectId == FName(TEXT("archive"))) { NeedCredits = 12; }
+    else if (ProjectId == FName(TEXT("probe"))) { NeedCredits = 24; NeedScience = 6; Requires = { FName(TEXT("archive")) }; }
+    else if (ProjectId == FName(TEXT("relay"))) { NeedCredits = 18; NeedEnergy = 4; Requires = { FName(TEXT("archive")) }; }
+    else if (ProjectId == FName(TEXT("aerostat"))) { NeedCredits = 40; NeedScience = 12; NeedSupplies = 12; Requires = { FName(TEXT("probe")), FName(TEXT("relay")) }; }
+    else if (ProjectId == FName(TEXT("logistics"))) { NeedCredits = 28; NeedEnergy = 6; Requires = { FName(TEXT("relay")) }; }
+    else if (ProjectId == FName(TEXT("lab"))) { NeedCredits = 34; NeedScience = 12; NeedSupplies = 6; Requires = { FName(TEXT("aerostat")), FName(TEXT("logistics")) }; }
+    else if (ProjectId == FName(TEXT("descent"))) { NeedCredits = 25; NeedScience = 10; Requires = { FName(TEXT("probe")) }; }
+    else if (ProjectId == FName(TEXT("lander"))) { NeedCredits = 32; NeedScience = 15; Requires = { FName(TEXT("descent")), FName(TEXT("relay")) }; }
     else return Reject(TEXT("Неизвестный инженерный проект."));
 
     for (const FName& Required : Requires)
@@ -112,16 +112,16 @@ bool UVenusMissionSubsystem::TryBuildProject(FName ProjectId)
     State.Supplies -= NeedSupplies;
     State.CompletedProjects.Add(ProjectId);
 
-    if (ProjectId == TEXT("probe")) State.Science += 10;
-    if (ProjectId == TEXT("descent")) State.Science += 8;
-    if (ProjectId == TEXT("aerostat")) State.AerostatCondition = 100;
+    if (ProjectId == FName(TEXT("probe"))) State.Science += 10;
+    if (ProjectId == FName(TEXT("descent"))) State.Science += 8;
+    if (ProjectId == FName(TEXT("aerostat"))) State.AerostatCondition = 100;
     return Accept(TEXT("Инженерный проект завершён: ") + ProjectId.ToString());
 }
 
 bool UVenusMissionSubsystem::SetOperationPolicy(FName Policy)
 {
-    if (!HasProject(TEXT("aerostat")) || State.bFinished ||
-        (Policy != TEXT("conserve") && Policy != TEXT("standard") && Policy != TEXT("intensive")))
+    if (!HasProject(FName(TEXT("aerostat"))) || State.bFinished ||
+        (Policy != FName(TEXT("conserve")) && Policy != FName(TEXT("standard")) && Policy != FName(TEXT("intensive"))))
         return Reject(TEXT("Недоступный эксплуатационный режим."));
     State.Policy = Policy;
     return Accept(TEXT("Режим эксплуатации: ") + Policy.ToString());
@@ -129,7 +129,7 @@ bool UVenusMissionSubsystem::SetOperationPolicy(FName Policy)
 
 bool UVenusMissionSubsystem::DispatchSupplies()
 {
-    if (!HasProject(TEXT("logistics")) || State.Credits < 16 || State.Energy < 3 || State.bFinished)
+    if (!HasProject(FName(TEXT("logistics"))) || State.Credits < 16 || State.Energy < 3 || State.bFinished)
         return Reject(TEXT("Нужны грузовая программа, 16 бюджета и 3 энергии."));
     State.Credits -= 16;
     State.Energy -= 3;
@@ -142,7 +142,7 @@ bool UVenusMissionSubsystem::DispatchSupplies()
 
 bool UVenusMissionSubsystem::RepairAerostat()
 {
-    if (!HasProject(TEXT("aerostat")) || State.AerostatCondition >= 100 ||
+    if (!HasProject(FName(TEXT("aerostat"))) || State.AerostatCondition >= 100 ||
         State.Credits < 12 || State.Supplies < 7 || State.bFinished)
         return Reject(TEXT("Ремонт требует 12 бюджета и 7 снабжения."));
     State.Credits -= 12;
@@ -159,7 +159,7 @@ bool UVenusMissionSubsystem::AdvancePeriod()
     ++State.Year;
     const int32 Income = 13 + (State.bInternational ? 9 : 0);
     State.Credits += Income;
-    State.Science += 3 + (HasProject(TEXT("probe")) ? 2 : 0);
+    State.Science += 3 + (HasProject(FName(TEXT("probe"))) ? 2 : 0);
     State.Energy += 3;
 
     for (int32 Index = State.Shipments.Num() - 1; Index >= 0; --Index)
@@ -172,12 +172,12 @@ bool UVenusMissionSubsystem::AdvancePeriod()
         }
     }
 
-    if (HasProject(TEXT("aerostat")))
+    if (HasProject(FName(TEXT("aerostat"))))
     {
-        const bool bLab = HasProject(TEXT("lab"));
-        const int32 ConsumedSupplies = !bLab ? 3 : State.Policy == TEXT("conserve") ? 2 : State.Policy == TEXT("intensive") ? 8 : 5;
-        const int32 ConsumedEnergy = !bLab ? 2 : State.Policy == TEXT("conserve") ? 1 : State.Policy == TEXT("intensive") ? 5 : 3;
-        const int32 Wear = !bLab ? 4 : State.Policy == TEXT("conserve") ? 2 : State.Policy == TEXT("intensive") ? 8 : 4;
+        const bool bLab = HasProject(FName(TEXT("lab")));
+        const int32 ConsumedSupplies = !bLab ? 3 : State.Policy == FName(TEXT("conserve")) ? 2 : State.Policy == FName(TEXT("intensive")) ? 8 : 5;
+        const int32 ConsumedEnergy = !bLab ? 2 : State.Policy == FName(TEXT("conserve")) ? 1 : State.Policy == FName(TEXT("intensive")) ? 5 : 3;
+        const int32 Wear = !bLab ? 4 : State.Policy == FName(TEXT("conserve")) ? 2 : State.Policy == FName(TEXT("intensive")) ? 8 : 4;
 
         if (State.Supplies >= ConsumedSupplies && State.Energy >= ConsumedEnergy)
         {
@@ -198,10 +198,10 @@ bool UVenusMissionSubsystem::AdvancePeriod()
         State.CriticalYears = State.AerostatCondition == 0 ? State.CriticalYears + 1 : 0;
     }
 
-    if (HasProject(TEXT("lab")) && State.AerostatCondition >= 40)
-        State.Science += State.Policy == TEXT("conserve") ? 3 : State.Policy == TEXT("intensive") ? 13 : 8;
+    if (HasProject(FName(TEXT("lab"))) && State.AerostatCondition >= 40)
+        State.Science += State.Policy == FName(TEXT("conserve")) ? 3 : State.Policy == FName(TEXT("intensive")) ? 13 : 8;
 
-    if (HasProject(TEXT("lab")) && State.AerostatCondition >= 60 &&
+    if (HasProject(FName(TEXT("lab"))) && State.AerostatCondition >= 60 &&
         (!State.bCampaign || State.bInternational))
         ++State.StableYears;
     else
@@ -210,13 +210,13 @@ bool UVenusMissionSubsystem::AdvancePeriod()
     if (State.CriticalYears >= 2)
     {
         State.bFinished = true;
-        State.Outcome = TEXT("failure");
+        State.Outcome = FName(TEXT("failure"));
         return Accept(TEXT("Аэростат потерян: миссия сорвана."));
     }
     if (State.StableYears >= 3)
     {
         State.bFinished = true;
-        State.Outcome = TEXT("victory");
+        State.Outcome = FName(TEXT("victory"));
         return Accept(TEXT("Создана устойчивая венерианская лаборатория."));
     }
     return Accept(TEXT("Следующий игровой период."));
@@ -224,7 +224,7 @@ bool UVenusMissionSubsystem::AdvancePeriod()
 
 int32 UVenusMissionSubsystem::GetScore() const
 {
-    const int32 Result = (State.Outcome == TEXT("victory") ? 300 : 0) +
+    const int32 Result = (State.Outcome == FName(TEXT("victory")) ? 300 : 0) +
         State.CompletedProjects.Num() * 25 + State.Science * 2 +
         State.AerostatCondition + State.Credits - (State.Turn - 1) * 8;
     return FMath::Max(0, Result);
