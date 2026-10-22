@@ -185,4 +185,42 @@ $("campaign").addEventListener("click",()=>switchMode("campaign"));
 $("session").addEventListener("click",()=>switchMode("session"));
 $("save").addEventListener("click",()=>{feedback=persist()?"Прогресс сохранён на этом устройстве.":"Браузер не разрешил сохранить игру.";render();});
 $("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;game=Engine.create(game.mode);persist();feedback="Начата новая игра.";render();});
+
+$("export-save").addEventListener("click",()=>{
+ try{
+  const data=JSON.stringify(game,null,2);
+  const blob=new Blob([data],{type:"application/json;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="HELIOS-Venus-"+game.mode+"-"+game.year+".json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  feedback="Сформирована резервная копия игры.";
+ }catch{
+  feedback="Не удалось экспортировать партию на этом устройстве.";
+ }
+ render();
+});
+$("import-save").addEventListener("click",()=>$("import-file").click());
+$("import-file").addEventListener("change",async event=>{
+ const file=event.target.files?.[0];
+ if(!file)return;
+ if(file.size>1000000){feedback="Файл сохранения слишком большой (максимум 1 МБ).";render();return;}
+ try{
+  const raw=await file.text();
+  const imported=Engine.restore(raw);
+  if(!imported){feedback="Файл не является совместимым сохранением HELIOS.";render();return;}
+  if(!confirm("Заменить текущую партию загруженным сохранением?"))return;
+  game=imported;persist();feedback="Сохранение загружено. Прогресс восстановлен.";
+ }catch{
+  feedback="Файл не удалось прочитать.";
+ }finally{
+  event.target.value="";
+ }
+ render();
+});
+if(typeof navigator!=="undefined"&&"serviceWorker" in navigator&&location.protocol==="https:"){
+ navigator.serviceWorker.register("./sw.js").catch(()=>{});
+}
+
 render();
