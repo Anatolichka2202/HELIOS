@@ -18,7 +18,7 @@ const PROJECTS=Object.freeze([
 {id:"lander",zone:"surface",name:"Поверхностный модуль",cost:{credits:32,science:15},requires:["descent","relay"],description:"Кратковременная роботизированная миссия к поверхности."}
 ]);
 const PROJECT_BY_ID=Object.fromEntries(PROJECTS.map(p=>[p.id,p]));
-function create(mode="campaign"){if(!["campaign","session"].includes(mode))throw Error("Invalid mode");return {version:4,mode,turn:1,year:2034,credits:mode==="session"?170:125,science:mode==="session"?36:20,energy:25,supplies:32,selected:"orbit",completed:[],shipments:[],condition:0,consecutiveYears:0,international:false,storyStep:0,finished:false,log:["2034 · В России обнаружен архив закрытой венерианской программы."]};}
+function create(mode="campaign"){if(!["campaign","session"].includes(mode))throw Error("Invalid mode");return {version:4,mode,turn:1,year:2034,credits:mode==="session"?170:125,science:mode==="session"?36:20,energy:25,supplies:32,selected:"orbit",completed:[],shipments:[],condition:0,consecutiveYears:0,international:false,storyStep:0,funding:null,criticalYears:0,outcome:null,finished:false,log:["2034 · В России обнаружен архив закрытой венерианской программы."]};}
 function copy(s){return {...s,completed:[...s.completed],shipments:s.shipments.map(x=>({...x})),log:[...s.log]};}
 function has(s,id){return s.completed.includes(id);}
 function addLog(s,text){s.log.unshift(s.year+" · "+text);s.log=s.log.slice(0,25);}
@@ -29,17 +29,41 @@ switch(command.type){
 case "select":if(!ZONES.some(z=>z.id===command.id))return {state:s,error:"Неизвестная зона."};n.selected=command.id;break;
 case "build":{const p=PROJECT_BY_ID[command.id];if(!canBuild(n,command.id))return {state:s,error:"Недоступный проект или недостаточно ресурсов."};for(const [key,val]of Object.entries(p.cost))n[key]-=val;n.completed.push(p.id);if(p.id==="probe")n.science+=10;if(p.id==="descent")n.science+=8;if(p.id==="aerostat")n.condition=100;addLog(n,"Завершено: "+p.name+".");break;}
 case "council":if(n.mode!=="campaign"||n.storyStep!==0)return {state:s,error:"Решение недоступно."};n.storyStep=1;n.science+=8;addLog(n,"Научный совет согласился проверить расчёты молодого инженера.");break;
-case "treaty":if(n.mode!=="campaign"||n.storyStep!==1||!has(n,"probe")||!has(n,"relay"))return {state:s,error:"Сначала нужен зонд и ретранслятор."};n.storyStep=2;n.international=true;n.credits+=55;n.supplies+=12;addLog(n,"Заключено предварительное международное соглашение. +55 бюджета, +12 снабжения.");break;
+case "funding":{
+ if(n.mode!=="campaign"||n.storyStep!==1||n.funding!==null||!["public","private"].includes(command.id))return {state:s,error:"Источник финансирования сейчас недоступен."};
+ n.funding=command.id;
+ if(command.id==="public"){if(n.credits<8)return {state:s,error:"Для открытых исследований нужен резерв 8 бюджета."};n.credits-=8;n.science+=12;addLog(n,"Выбраны открытые государственные исследования: +12 науки, −8 бюджета.");}
+ else{n.credits+=36;n.science=Math.max(0,n.science-6);addLog(n,"Подключены частные инвесторы: +36 бюджета, −6 науки. Права на результаты ограничены.");}
+ break;
+}
+case "treaty":{
+ if(n.mode!=="campaign"||n.storyStep!==1||n.funding===null||!has(n,"probe")||!has(n,"relay"))return {state:s,error:"Нужны источник финансирования, зонд и ретранслятор."};
+ n.storyStep=2;n.international=true;
+ const grant=n.funding==="public"?65:45, supplies=n.funding==="public"?20:8;
+ n.credits+=grant;n.supplies+=supplies;
+ addLog(n,"Открыта международная программа. Грант: +"+grant+" бюджета, +"+supplies+" снабжения.");
+ break;
+}
 case "shipment":if(!has(n,"logistics")||n.credits<16||n.energy<3)return {state:s,error:"Нужна грузовая программа и 16 бюджета, 3 энергии."};n.credits-=16;n.energy-=3;n.shipments.push({arrival:n.turn+2,amount:22});addLog(n,"С Земли отправлен груз (+22 через два хода).");break;
 case "repair":if(!has(n,"aerostat")||n.condition>=100||n.credits<12||n.supplies<7)return {state:s,error:"Для ремонта нужны 12 бюджета и 7 снабжения."};n.credits-=12;n.supplies-=7;n.condition=Math.min(100,n.condition+35);addLog(n,"Выполнен ремонт аэростата: +35 состояния.");break;
 case "next":{n.turn++;n.year++;let income=13+(n.international?9:0);n.credits+=income;n.science+=3+(has(n,"probe")?2:0);n.energy+=3;const arriving=n.shipments.filter(x=>x.arrival<=n.turn);n.shipments=n.shipments.filter(x=>x.arrival>n.turn);for(const load of arriving){n.supplies+=load.amount;addLog(n,"Земной груз доставлен: +"+load.amount+" снабжения.");}
 if(has(n,"aerostat")){const maintenance=has(n,"lab")?5:3;const power=has(n,"lab")?3:2;const stocked=n.supplies>=maintenance&&n.energy>=power;if(stocked){n.supplies-=maintenance;n.energy-=power;n.condition=Math.max(0,n.condition-4);}else{n.condition=Math.max(0,n.condition-22);addLog(n,"Недостаток энергии или снабжения: деградация платформы.");}
-const storm=(n.turn*7+3)%13>=10;if(storm){n.condition=Math.max(0,n.condition-13);addLog(n,"Кислотный шторм: повреждение аэростатной платформы.");}if(n.condition===0)addLog(n,"Аэростат выведен из эксплуатации. Требуется ремонт.");}
+const storm=(n.turn*7+3)%13>=10;if(storm){n.condition=Math.max(0,n.condition-13);addLog(n,"Кислотный шторм: повреждение аэростатной платформы.");}if(n.condition===0){n.criticalYears++;addLog(n,"Аэростат выведен из эксплуатации: ещё один год простоя сорвёт миссию.");}
+else n.criticalYears=0;
+}
 if(has(n,"lab")&&n.condition>=40)n.science+=8;
 if(has(n,"lab")&&n.condition>=60&&(n.mode==="session"||n.international))n.consecutiveYears++;else n.consecutiveYears=0;
-if(n.consecutiveYears>=3){n.finished=true;addLog(n,"Устойчивая программа исследований Венеры создана. Первый сценарий завершён.");}else addLog(n,"Годовой бюджет: +"+income+". Исследования продолжены.");break;}
+if(n.criticalYears>=2){n.finished=true;n.outcome="failure";addLog(n,"Миссия сорвана: аэростат не восстановлен в течение двух лет.");}
+else if(n.consecutiveYears>=3){n.finished=true;n.outcome="victory";addLog(n,"Устойчивая программа исследований Венеры создана. Первый сценарий завершён.");}
+else addLog(n,"Годовой бюджет: +"+income+". Исследования продолжены.");
+break;}
 default:return {state:s,error:"Неизвестная команда."};
 }return {state:n,error:null};}
-function restore(json){try{const s=JSON.parse(json);if(!s||s.version!==4||!["campaign","session"].includes(s.mode)||!ZONES.some(z=>z.id===s.selected)||!Array.isArray(s.completed)||!Array.isArray(s.shipments)||!Array.isArray(s.log))return null;for(const k of ["turn","year","credits","science","energy","supplies","condition","consecutiveYears","storyStep"])if(!Number.isFinite(s[k])||s[k]<0)return null;if(s.completed.some(id=>!PROJECT_BY_ID[id]))return null;return s;}catch{return null;}}
+function restore(json){try{const s=JSON.parse(json);if(!s||s.version!==4||!["campaign","session"].includes(s.mode)||!ZONES.some(z=>z.id===s.selected)||!Array.isArray(s.completed)||!Array.isArray(s.shipments)||!Array.isArray(s.log))return null;for(const k of ["turn","year","credits","science","energy","supplies","condition","consecutiveYears","storyStep"])if(!Number.isFinite(s[k])||s[k]<0)return null;if(s.completed.some(id=>!PROJECT_BY_ID[id]))return null;
+ if(s.funding===undefined)s.funding=null;
+ if(s.criticalYears===undefined)s.criticalYears=0;
+ if(s.outcome===undefined)s.outcome=s.finished?"victory":null;
+ if(![null,"public","private"].includes(s.funding)||!Number.isInteger(s.criticalYears)||s.criticalYears<0)return null;
+ return s;}catch{return null;}}
 return {ZONES,PROJECTS,create,apply,has,canBuild,restore};
 });
