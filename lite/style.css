@@ -46,3 +46,13 @@
 @media(max-width:900px){.field-report{grid-template-columns:1fr}.illustrated-stage{min-height:280px}.field-dashboard{padding:15px}.forecast-grid{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:550px){.field-scene,.field-dashboard{padding:14px}.illustrated-stage{min-height:210px}.scene-hint{font-size:11px;bottom:8px;left:8px;right:8px}.forecast-grid b{font-size:17px}.policies button{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.stage-object,.meter>div{transition:none}}
+
+/* Mobile toolbar must not overflow a 320–390px screen after save import/export was added. */
+header{flex-wrap:wrap}
+.head-actions{display:flex;gap:6px;flex-wrap:wrap}
+.head-actions button{min-height:38px}
+@media(max-width:680px){
+ header{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
+ .head-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .head-actions button{font-size:10px;padding:8px 3px;min-height:44px;white-space:normal;line-height:1.2}
+}
