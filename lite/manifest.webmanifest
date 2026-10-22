@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "HELIOS: Venus Initiative",
+  "short_name": "HELIOS Venus",
+  "description": "Инженерно-экономическая экспедиция в облаках Венеры. Кампания и свободная сессия.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#091321",
+  "theme_color": "#0b1322",
+  "lang": "ru",
+  "categories": [
+    "games",
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "assets/helios-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
