@@ -148,6 +148,7 @@ case "repair":if(!has(n,"aerostat")||n.condition>=100||n.credits<12||n.supplies<
 case "next":{
  if(n.event)return {state:s,error:"Экспедиция ждёт решения по атмосферному событию."};
  const hadAerostat=has(n,"aerostat"),hadLab=has(n,"lab");
+ let operating=!hadAerostat;
  const oldCredits=n.credits,oldScience=n.science,oldEnergy=n.energy,oldSupplies=n.supplies;
  n.turn++;n.year++;
  const income=13+(n.international?9:0)-(n.funding==="private"&&hadLab?6:0);
@@ -160,6 +161,7 @@ if(hadAerostat){
  const maintenance=policy?policy.supplies:3;
  const power=policy?policy.energy:2;
  const stocked=n.supplies>=maintenance&&n.energy>=power;
+ operating=stocked;
  if(stocked){n.supplies-=maintenance;n.energy-=power;
   const wear=Math.max(1,(policy?policy.wear:4)+(DESIGNS[n.design]?.wear||0)-(n.prototype?3:0));
   n.condition=Math.max(0,n.condition-wear);}
@@ -171,10 +173,10 @@ const storm=(n.turn*7+3)%13>=10;if(storm){
 }if(n.condition===0){n.criticalYears++;addLog(n,"Аэростат выведен из эксплуатации: ещё один год простоя сорвёт миссию.");}
 else n.criticalYears=0;
 }
-if(hadLab&&n.condition>=40){
+if(hadLab&&operating&&n.condition>=40){
  n.science+=Math.max(1,(POLICIES[n.policy||"standard"]||POLICIES.standard).science+(DESIGNS[n.design]?.science||0));
 }
-if(hadLab&&n.condition>=60&&(n.mode==="session"||n.international))n.consecutiveYears++;else n.consecutiveYears=0;
+if(hadLab&&operating&&n.condition>=60&&(n.mode==="session"||n.international))n.consecutiveYears++;else n.consecutiveYears=0;
 const ready=n.buildQueue.filter(x=>x.ready<=n.turn);
 n.buildQueue=n.buildQueue.filter(x=>x.ready>n.turn);
 for(const queued of ready){
@@ -189,7 +191,7 @@ if(hadLab&&!n.eventResolved&&!n.event){
 if(n.criticalYears>=2){n.finished=true;n.outcome="failure";addLog(n,"Миссия сорвана: аэростат не восстановлен в течение двух лет.");}
 else if(n.consecutiveYears>=3&&!n.event){n.finished=true;n.outcome="victory";addLog(n,"Устойчивая программа исследований Венеры создана. Первый сценарий завершён.");}
 else addLog(n,"Годовой бюджет: +"+income+". Исследования продолжены.");
- n.lastTurn={year:n.year,credits:n.credits-oldCredits,science:n.science-oldScience,energy:n.energy-oldEnergy,supplies:n.supplies-oldSupplies,arrivals:arriving.reduce((total,load)=>total+load.amount,0),condition:n.condition,operating:has(n,"aerostat")&&n.condition>0,policy:n.policy||"standard"};
+ n.lastTurn={year:n.year,credits:n.credits-oldCredits,science:n.science-oldScience,energy:n.energy-oldEnergy,supplies:n.supplies-oldSupplies,arrivals:arriving.reduce((total,load)=>total+load.amount,0),condition:n.condition,operating:hadAerostat&&operating&&n.condition>0,policy:n.policy||"standard"};
  break;}
 default:return {state:s,error:"Неизвестная команда."};
 }return {state:n,error:null};}
@@ -224,7 +226,7 @@ function forecast(s){
  nextYear:s.year+1,
  credits:13+(s.international?9:0)-(s.funding==="private"&&lab?6:0),
  science:3+(has(s,"probe")?2:0)+(s.funding==="public"&&lab?3:0)+
-  (lab&&s.condition>=40?Math.max(1,(policy||POLICIES.standard).science+(DESIGNS[s.design]?.science||0)):0),
+  (lab&&stocked&&s.condition>=40?Math.max(1,(policy||POLICIES.standard).science+(DESIGNS[s.design]?.science||0)):0),
  energy:3-(active&&stocked?power:0),
  supplies:arriving-(active&&stocked?cost:0),
  incoming:arriving,maintenance:cost,shortage:!stocked,
