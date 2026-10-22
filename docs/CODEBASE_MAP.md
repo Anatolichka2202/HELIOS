@@ -1,6 +1,6 @@
 # HELIOS — карта кодовой базы
 
-Статус: инвентаризация исходников по состоянию на 22.10.2026. Основная ветка `main`, репозиторий `Anatolichka2202/HELIOS`.
+Статус: инвентаризация обновлена 23.10.2026, после Venus 0.6. Основная ветка `main`, репозиторий `Anatolichka2202/HELIOS`.
 
 ## Цель и границы
 
@@ -10,6 +10,7 @@
 
 | Путь | Владелец подсистемы | Назначение | Реальный статус |
 |---|---|---|---|
+| `lite/sw.js`, `lite/manifest.webmanifest`, `lite/assets/helios-icon.svg` | Web PWA | Офлайн-кэш и установка браузерного клиента (после HTTPS) | Source committed, device test pending |
 | `lite/index.html` | Web UI | Разметка игры: вступление, зоны, проекты, решения, журнал | Активный клиент |
 | `lite/style.css` | Web UI / Art | Адаптивный мобильный интерфейс, фон, панели и кнопки | Активный клиент |
 | `lite/assets/venus-clouds.svg` | Web Art | Векторный арт облачной Венеры и аэростата | Активный ассет |
@@ -21,8 +22,15 @@
 | `pc/HELIOS.uproject` | PC / Unreal | Точка входа Unreal Editor | Исходники, сборка UE не подтверждена |
 | `pc/Source/HELIOS.Target.cs`, `HELIOSEditor.Target.cs` | PC Build | Build targets игры и редактора | Не проверены в UE Editor |
 | `pc/Source/HELIOS/HELIOS.Build.cs`, `Private/HELIOS.cpp` | PC Build | Unreal module и зависимости движка | Не проверены в UE Editor |
+| `pc/Source/HELIOS/Public/VenusMissionSubsystem.h`, `Private/VenusMissionSubsystem.cpp` | PC Domain | GameInstance: общие ресурсы, сделки, стройка, груз, ремонт, финал | Исходник UE, компиляция не проверена |
+| `pc/Source/HELIOS/Public/VenusPrototypeGameMode.h`, `Private/VenusPrototypeGameMode.cpp` | PC Runtime | Запуск игрового мира с венерианской сценой | Исходник UE, компиляция не проверена |
+| `pc/Source/HELIOS/Public/VenusPrototypePlayerController.h`, `Private/VenusPrototypePlayerController.cpp` | PC Controls | Отладочные команды клавиатуры | Исходник UE, компиляция не проверена |
+| `pc/Source/HELIOS/Public/VenusMissionConsole.h`, `Private/VenusMissionConsole.cpp` | PC First-person integration | Терминал читает тот же mission state, может выполнять ремонт | Исходник UE, компиляция не проверена |
 | `pc/Source/HELIOS/Public/VenusPrototypeActor.h`, `Private/VenusPrototypeActor.cpp` | PC View | Венера, условный аэростат и ретранслятор в 3D | Заготовка сцены, не игра |
 | `pc/Source/HELIOS/Public/SolarSystemActor.h`, `Private/SolarSystemActor.cpp` | PC / Future | Демонстрация восьми планет | Долгосрочный эксперимент, не венерианская сцена |
+| `mobile/Assets/Scripts/VenusSessionModel.cs` | Mobile Domain | Собственная локальная C# Венера: стройка, снабжение, износ, режимы, сюжеты и финалы | Исходник, Unity compile не проверен |
+| `mobile/Assets/Scripts/VenusPlayableBootstrap.cs` | Mobile Client | Игровая 3D-заготовка с временным OnGUI, PlayerPrefs, управлением симуляцией | Интерактивный исходник, Android/iOS не собраны |
+| `mobile/Assets/Editor/HeliosSceneCreator.cs` | Mobile Tooling | Генерация стартовой игровой сцены через меню Unity Editor | Не проверено в Unity |
 | `mobile/Assets/Scripts/VenusMissionCatalog.cs` | Mobile / Data | Каталог четырёх венерианских операционных зон | Начальный C# источник |
 | `mobile/Assets/Scripts/VenusPreviewBootstrap.cs` | Mobile View | Создаёт заглушку 3D-планеты, камеру, свет, debug-переключение зон | Unity-прототип без сборки |
 | `mobile/Assets/Scripts/SolarSystemCatalog.cs` | Mobile / Future | Каталог восьми планет | Задел полной франшизы |
