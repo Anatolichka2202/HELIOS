@@ -117,3 +117,13 @@ test("session preset survives browser save and restore",()=>{
  assert.equal(restored.preset,"constrained");
  assert.equal(restored.credits,120);
 });
+
+test("forecast detects known energy shortage before future damage",()=>{
+ let s=campaignToBase();
+ s={...s,supplies:0,energy:0,condition:80};
+ const f=E.forecast(s);
+ assert.equal(f.shortage,true);
+ assert.equal(f.predictedCondition,58);
+ assert.equal(f.supplies,0);
+ assert.ok(E.apply(s,{type:"next"}).state.condition<=58);
+});
