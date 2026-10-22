@@ -46,6 +46,15 @@ function drawProjects(){
   card.append(element("h4","","Отправить снабжение с Земли"),element("p","","22 единицы через два игровых хода. Перевозка стоит 16 бюджета и 3 энергии."));
   card.append(makeButton("Заказать груз",()=>change({type:"shipment"}),game.credits<16||game.energy<3||game.finished));root.append(card);
  }
+ if(game.selected==="clouds"&&game.insight==="sample"&&Engine.has(game,"lab")){
+  const card=element("div","project technology");
+  card.append(element("h4","","Кислотостойкое покрытие — открытая технология"),
+    element("p","","Исследования химического фронта позволяют создать новый состав для оболочки. Навсегда уменьшает износ на 3 и ущерб штормов на 4."),
+    element("small","","18 бюджета · 20 науки · 4 снабжения"));
+  card.append(makeButton(game.prototype?"Прототип установлен":"Синтезировать покрытие",()=>change({type:"prototype"}),
+    game.prototype||game.credits<18||game.science<20||game.supplies<4||game.finished));
+  root.append(card);
+ }
  if(game.selected==="clouds"&&Engine.has(game,"aerostat")){
   const card=element("div","project");
   card.append(element("h4","","Обслуживание аэростата"),element("p","","Состояние "+game.condition+"%. Ремонт: 12 бюджета и 7 снабжения (+35%)."));
@@ -145,6 +154,8 @@ function nextObjective(){
  for(const [id,title,description] of expansion){
   if(!Engine.has(game,id))return {title,description,zone:Engine.PROJECTS.find(p=>p.id===id).zone};
  }
+ if(game.insight==="sample"&&!game.prototype&&Engine.has(game,"lab")&&game.science>=20&&game.credits>=18&&game.supplies>=4)
+   return {title:"Создать кислотостойкое покрытие",description:"В результате рискованного пробоотбора открыта новая технология. Уменьшите будущий износ аэростата.",zone:"clouds"};
  if(game.condition<60)return {title:"Восстановить платформу",description:"Состояние аэростата ниже 60%: проведите ремонт.",zone:"clouds"};
  if(game.supplies<8)return {title:"Заказать снабжение",description:"Резерв расходников истощается. Отправьте груз с Земли до следующей аварии.",zone:"orbit"};
  return {title:"Обеспечить три года устойчивой работы",description:"Успешных лет: "+game.consecutiveYears+" из 3. Контролируйте состояние, энергию и расходники.",zone:null};
@@ -179,6 +190,7 @@ function drawOperations(){
  $("visual-aerostat").classList.toggle("active",built);
  $("visual-aerostat").classList.toggle("building",(game.buildQueue||[]).some(q=>q.id==="aerostat"));
  $("visual-aerostat").classList.toggle("damaged",built&&game.condition<45);
+ $("visual-aerostat").classList.toggle("prototype",built&&game.prototype);
  $("visual-lab").classList.toggle("active",Engine.has(game,"lab"));
  $("visual-lab").classList.toggle("building",(game.buildQueue||[]).some(q=>q.id==="lab"));
  let stage="ПОДГОТОВКА",caption="Сначала восстановите архив, затем отправьте атмосферный зонд.";
@@ -188,6 +200,7 @@ function drawOperations(){
  if((game.buildQueue||[]).some(q=>q.id==="aerostat")){stage="МОНТАЖ";caption="Инженеры собирают "+Engine.DESIGNS[game.design].name.toLowerCase()+". Ввод после следующего периода.";}
  if((game.buildQueue||[]).some(q=>q.id==="lab")){stage="МОНТАЖ ЛАБОРАТОРИИ";caption="Научные модули проходят установку. Требуется один игровой период.";}
  if(game.event){stage="КРИЗИС";caption="Кислотный фронт. Выберите ответ экспедиции, прежде чем продолжать симуляцию.";}
+ if(game.prototype){caption="Экспериментальное защитное покрытие установлено. Износ и ущерб кислотных фронтов сокращены.";}
  if(game.finished){stage=game.outcome==="victory"?"МИССИЯ ВЫПОЛНЕНА":"МИССИЯ ПРОВАЛЕНА";caption=game.outcome==="victory"?"Венерианская исследовательская программа стала устойчивой.":"Время простоя уничтожило аэростат. Разберите решения и попробуйте другой путь.";}
  $("scene-stage").textContent=stage;
  $("scene-caption").textContent=caption;
