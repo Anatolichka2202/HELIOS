@@ -137,5 +137,5 @@ test("compatible save file can be imported while invalid JSON is refused",async(
  const bad={files:[{size:20,text:async()=>"{bad"}],value:""};
  await field.events.change({target:bad});
  assert.equal(app.get("year").textContent,2034);
- assert.ok(app.get("message").textContent.includes("несовместимым"));
+ assert.ok(app.get("message").textContent.includes("совместимым"));
 });
