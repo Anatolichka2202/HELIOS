@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 740" role="img" aria-labelledby="title description">
+<title id="title">HELIOS — облачные горизонты Венеры</title><desc id="description">Авторская векторная игровая иллюстрация: атмосферный горизонт Венеры, облака и первая аэростатная станция.</desc>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#101c36"/><stop offset=".45" stop-color="#66464e"/><stop offset=".75" stop-color="#b97550"/><stop offset="1" stop-color="#f2a356"/></linearGradient>
+<radialGradient id="light" cx=".7" cy=".3" r=".7"><stop stop-color="#ffe0a7" stop-opacity=".8"/><stop offset=".5" stop-color="#df915d" stop-opacity=".35"/><stop offset="1" stop-color="#f2a356" stop-opacity="0"/></radialGradient>
+<linearGradient id="cloud" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffd9a0"/><stop offset=".5" stop-color="#da8c61"/><stop offset="1" stop-color="#65445a"/></linearGradient>
+<linearGradient id="envelope" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#efcda2"/><stop offset=".4" stop-color="#b8866c"/><stop offset="1" stop-color="#604458"/></linearGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="18"/></filter><filter id="glow"><feGaussianBlur stdDeviation="5"/></filter>
+</defs>
+<rect width="1440" height="740" fill="url(#sky)"/><rect width="1440" height="740" fill="url(#light)"/>
+<path d="M0 245 Q340 220 700 266 T1440 188" fill="none" stroke="#fbe5c1" stroke-opacity=".7" stroke-width="5"/><path d="M0 252 Q390 220 740 275 T1440 193 L1440 520 L0 520Z" fill="#be805a" opacity=".18"/>
+<g fill="#ffe2b7" opacity=".7" filter="url(#blur)"><ellipse cx="930" cy="280" rx="210" ry="65"/><ellipse cx="640" cy="400" rx="270" ry="55"/><ellipse cx="1150" cy="445" rx="260" ry="70"/></g>
+<g fill="url(#cloud)"><path d="M0 370 Q110 292 180 360 Q300 270 440 350 Q580 280 690 365 Q810 280 975 370 Q1120 310 1260 355 Q1370 280 1440 340 V740 H0Z"/><path d="M0 470 Q200 360 365 470 Q550 345 730 460 Q920 335 1080 470 Q1250 360 1440 440 L1440 740 H0Z" opacity=".83"/><path d="M0 582 Q160 460 330 574 Q530 480 700 568 Q910 470 1120 573 Q1270 475 1440 550 V740 H0Z" opacity=".9"/></g>
+<g stroke="#f6c38b" stroke-opacity=".2" fill="none" stroke-width="3"><path d="M0 500 Q350 440 760 518 T1440 490"/><path d="M0 610 Q300 535 670 600 T1440 565"/><path d="M30 687 Q450 600 890 656 T1440 645"/></g>
+<!-- Scientific aerostat envelope -->
+<g transform="translate(1000 146)">
+<ellipse cx="230" cy="130" rx="198" ry="101" fill="#050a16" opacity=".4" filter="url(#blur)"/>
+<ellipse cx="225" cy="120" rx="200" ry="108" fill="url(#envelope)" stroke="#f0d0a5" stroke-opacity=".6" stroke-width="2"/>
+<path d="M30 122 Q225 148 421 117 M40 87 Q230 106 405 89 M60 162 Q220 180 395 161" fill="none" stroke="#815d51" stroke-width="5" opacity=".65"/>
+<path d="M225 15 Q185 120 225 225 M225 15 Q267 120 225 225 M155 25 Q100 120 150 214 M300 26 Q350 120 300 212" fill="none" stroke="#e4c19a" stroke-opacity=".55" stroke-width="2"/>
+<path d="M100 197 L160 272 M350 192 L294 272 M224 226 L224 272" stroke="#413944" stroke-width="4" fill="none"/>
+<path d="M146 273 H305 L286 316 H165Z" fill="#24384a" stroke="#efc598" stroke-width="3"/>
+<rect x="161" y="276" width="129" height="28" rx="3" fill="#495968"/><g fill="#ffe3a2"><rect x="173" y="281" width="16" height="10"/><rect x="198" y="281" width="16" height="10"/><rect x="223" y="281" width="16" height="10"/><rect x="248" y="281" width="16" height="10"/></g>
+<path d="M226 316 L226 345 M214 340 H238" stroke="#dfc5a3" stroke-width="3"/>
+<path d="M160 281 L90 283 L90 311 L160 306 M305 281 L366 284 L366 312 L290 305" stroke="#91bfce" stroke-width="6"/>
+<path d="M218 13 L218 -25 M200 -25 H240 M218 -25 L195 -48" stroke="#f0d7b2" stroke-width="2" fill="none"/>
+<circle cx="218" cy="-25" r="6" fill="#ffe0a5"/>
+</g>
+<!-- Orbital relay vehicle -->
+<g transform="translate(890 115) rotate(-16)"><rect x="0" y="0" width="42" height="27" rx="4" fill="#d8b999"/><path d="M-105 -15 H-3 V43 H-105 Z M45 -15 H146 V43 H45 Z" fill="#1b466d" stroke="#aedce3" stroke-width="3"/><g stroke="#8babc6" stroke-width="2"><path d="M-72 -15 V43 M-38 -15 V43 M78 -15 V43 M111 -15 V43 M-105 15 H-3 M45 15 H146"/></g><path d="M20 0 V-37 M0 -37 H40" stroke="#d9d0ae" stroke-width="3"/></g>
+<g fill="#fff4d6" opacity=".9"><circle cx="130" cy="94" r="2.5"/><circle cx="390" cy="145" r="1.6"/><circle cx="738" cy="70" r="2"/><circle cx="1320" cy="80" r="2"/></g>
+</svg>
