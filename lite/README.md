@@ -1,4 +1,4 @@
-# HELIOS Lite — Venus Initiative (0.4)
+# HELIOS Lite — Venus Initiative (0.5)
 
 The first playable vertical slice is **Venus**. The planned franchise remains Solar System-wide.
 
@@ -36,3 +36,12 @@ This is not a live public URL until deployment succeeds.
 - Game state is local to the browser, not cloud-synced.
 
 See [Venus vertical slice](../design/VENUS_VERTICAL_SLICE.md), [campaign](../design/VENUS_CAMPAIGN.md), and [shared scenario contract](../shared/venus-scenario.json).
+
+## New in 0.5
+
+- Funding choice: publicly funded open science or private backers, with different upfront budgets and international-grant outcomes.
+- Expedition failure if the aerostat remains nonoperational for two consecutive turns.
+- Autosave after successful decisions and turns.
+- Step-by-step actionable mission objective for new players.
+- Original Venus/aerostat SVG art tracked in this repository.
+- UI smoke tests, scenario-contract checks, and GitHub Actions build gates.
