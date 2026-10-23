@@ -15,7 +15,9 @@
 | 08 | [TECH_NETWORK_NATIVE](08_TECH_NETWORK_NATIVE.md) | Архитектура трёх клиентов, нативность, общий контракт, сервер S0–S3, heavy solver |
 | 09 | [NARRATIVE_AND_ART](09_NARRATIVE_AND_ART.md) | Сюжет СССР → Россия → международный, персонаж, развилки, визуал и музыка |
 | 10 | [DECISIONS_ROADMAP](10_DECISIONS_ROADMAP.md) | Первоначальная очередность разработки и критерии проверки |
-| **11** | **[FRANCHISE_PRODUCT_STRATEGY](11_FRANCHISE_PRODUCT_STRATEGY.md)** | **Актуальная версия v0.4: три независимые игры, прямая выручка Lite, честные переходы, облачная PC vs удалённая симуляция** |
+| **11** | **[FRANCHISE_PRODUCT_STRATEGY](11_FRANCHISE_PRODUCT_STRATEGY.md)** | **Стратегия v0.4: три независимые игры, прямая выручка Lite, честные переходы, облачная PC vs удалённая симуляция** |
+| **12** | **[HELIOS_GDD_BRIEF](12_HELIOS_GDD_BRIEF.md)** | **Актуальный короткий GDD v0.5: идея, игровой цикл, Венера, Lite/Mobile/PC, экономика и ограничения** |
+| **13** | **[HELIOS_EXECUTION_PLAN](13_HELIOS_EXECUTION_PLAN.md)** | **Актуальный план v0.5: этапы P0–P7, критерии качества и следующий спринт** |
 
 ## На что ориентироваться при противоречиях
 
