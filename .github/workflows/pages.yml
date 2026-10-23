@@ -1,10 +1,7 @@
 name: Publish HELIOS Venus Lite
+# The repository currently publishes GitHub Pages from main/(root).
+# Keep this alternative Actions deployment manual to avoid dual publishers.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'lite/**'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
   contents: read
