@@ -56,6 +56,15 @@ jobs:
           cp tools/promos/*.mp4 media/promos/
           cp tools/promos/*_preview.png media/promos/
 
+      - name: Upload ready-to-share trailers
+        uses: actions/upload-artifact@v4
+        with:
+          name: helios-concept-trailers
+          path: |
+            media/promos/*.mp4
+            media/promos/*_preview.png
+          retention-days: 90
+
       - name: Commit rendered assets into Git
         run: |
           git config user.name "github-actions[bot]"
