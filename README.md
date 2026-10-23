@@ -6,6 +6,8 @@ Multi-platform strategy project about human expansion across the **entire Solar 
 
 ## Start here — concept, architecture and what the code really does
 
+**[Краткий GDD HELIOS v0.5](design/12_HELIOS_GDD_BRIEF.md)** · **[Короткий план разработки v0.5](design/13_HELIOS_EXECUTION_PLAN.md)**
+
 **[Новая стратегия франшизы v0.4: Lite зарабатывает, Mobile и PC предлагают разные игры](design/11_FRANCHISE_PRODUCT_STRATEGY.md)**
 
 **[Документы HELIOS: общий замысел + три спецификации + игровая и коммерческая экономика](design/00_INDEX.md)**
