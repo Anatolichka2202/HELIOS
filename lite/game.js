@@ -1,5 +1,6 @@
 "use strict";
 const Engine=globalThis.HeliosVenus;
+const Cinema=globalThis.HeliosCinema;
 const $=id=>document.getElementById(id);
 const labels={credits:"бюджет",science:"наука",energy:"энергия",supplies:"снабжение"};
 let stored=null;
@@ -53,6 +54,22 @@ function drawProjects(){
     element("small","","18 бюджета · 20 науки · 4 снабжения"));
   card.append(makeButton(game.prototype?"Прототип установлен":"Синтезировать покрытие",()=>change({type:"prototype"}),
     game.prototype||game.credits<18||game.science<20||game.supplies<4||game.finished));
+  root.append(card);
+ }
+ // Signal loss becomes an optional engineering branch even if the movie is skipped.
+ if(game.selected==="clouds"&&Engine.has(game,"probe")&&!game.probeDiscovery&&!game.finished){
+  const card=element("div","project signal-investigation");
+  card.append(element("h4","","Потерянный сигнал зонда"),
+    element("p","","Аномальная телеметрия. Выберите план исследований: каждый изменяет ресурсы, а некоторые решения влияют на будущие периоды."));
+  for(const d of Object.values(Engine.PROBE_STRATEGIES)){
+   const missing=Object.entries(d.cost).some(([key,value])=>game[key]<value);
+   const btn=makeButton(d.name,()=>change({type:"probe-response",id:d.id}),missing,"decision-choice");
+   const cost=Object.entries(d.cost).map(([k,v])=>"−"+v+" "+labels[k]).join(" · ");
+   const gains=Object.entries(d.gains).map(([k,v])=>"+"+v+" "+labels[k]).join(" · ");
+   btn.append(element("small","",d.description+" · "+[cost,gains].filter(Boolean).join(" · ")));
+   card.append(btn);
+  }
+  card.append(makeButton("Посмотреть историю сигнала",()=>Cinema.open("probe"),false,"ghost"));
   root.append(card);
  }
  if(game.selected==="clouds"&&Engine.has(game,"aerostat")){
@@ -151,6 +168,8 @@ function nextObjective(){
  for(const [id,title,description] of required){
   if(!Engine.has(game,id))return {title,description,zone:Engine.PROJECTS.find(p=>p.id===id).zone};
  }
+ if(Engine.has(game,"probe")&&!game.probeDiscovery)return {
+   title:"Разобрать потерянный сигнал",description:"Восстановить телеметрию, опубликовать данные или спасти аппарат? Три разные цены и последствия.",zone:"clouds"};
  if(game.mode==="campaign"&&game.storyStep===1)return {title:"Открыть международную программу",description:"Покажите результаты исследований партнёрам и согласуйте совместную миссию.",zone:null};
  if(!game.design)return {title:"Выбрать конструкцию аэростата",description:"Дорогая защита уменьшит аварии; лёгкая платформа ускорит науку, но потребует тщательного обслуживания.",zone:null};
  const expansion=[
@@ -201,7 +220,7 @@ function drawOperations(){
  $("visual-lab").classList.toggle("active",Engine.has(game,"lab"));
  $("visual-lab").classList.toggle("building",(game.buildQueue||[]).some(q=>q.id==="lab"));
  let stage="ПОДГОТОВКА",caption="Сначала восстановите архив, затем отправьте атмосферный зонд.";
- if(Engine.has(game,"probe")){stage="ИССЛЕДОВАНИЯ";caption="Зонд начал изучать химическую и динамическую среду Венеры.";}
+ if(Engine.has(game,"probe")){stage="ИССЛЕДОВАНИЯ";caption=game.probeDiscovery?"Решение по телеметрии: "+Engine.PROBE_STRATEGIES[game.probeDiscovery].name+".":"Телеметрия прервана. Нужно принять научное решение.";}
  if(Engine.has(game,"aerostat")){stage="АЭРОСТАТ";caption="Первый аппарат закрепился в облачном слое. Следите за состоянием и снабжением.";}
  if(Engine.has(game,"lab")){stage="ЛАБОРАТОРИЯ";caption="Исследовательская станция действует: "+game.consecutiveYears+"/3 устойчивых лет.";}
  if((game.buildQueue||[]).some(q=>q.id==="aerostat")){stage="МОНТАЖ";caption="Инженеры собирают "+Engine.DESIGNS[game.design].name.toLowerCase()+". Ввод после следующего периода.";}
@@ -274,12 +293,13 @@ function render(){
  drawZones();drawProjects();drawStory();drawObjective();drawOperations();drawDecisions();
  $("events").replaceChildren(...game.log.slice(0,9).map(x=>element("div","",x)));
  $("message").textContent=feedback;
+ Cinema.sync();
 }
 function switchMode(mode){
  const preset=$("session-preset").value;
  if(game.mode===mode&&(mode!=="session"||game.preset===preset))return;
  if(!confirm("Начать новую "+(mode==="campaign"?"кампанию":"сессию")+"? Текущий прогресс будет потерян."))return;
- game=Engine.create(mode,preset);persist();feedback="Начата новая игра.";render();
+ Cinema.clear();game=Engine.create(mode,preset);persist();feedback="Начата новая игра.";render();
 }
 $("next").addEventListener("click",()=>change({type:"next"}));
 $("focus-goal").addEventListener("click",()=>{
@@ -292,7 +312,7 @@ $("focus-goal").addEventListener("click",()=>{
 $("campaign").addEventListener("click",()=>switchMode("campaign"));
 $("session").addEventListener("click",()=>switchMode("session"));
 $("save").addEventListener("click",()=>{feedback=persist()?"Прогресс сохранён на этом устройстве.":"Браузер не разрешил сохранить игру.";render();});
-$("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;game=Engine.create(game.mode,game.preset||"standard");persist();feedback="Начата новая игра.";render();});
+$("reset").addEventListener("click",()=>{if(!confirm("Сбросить текущую игру?"))return;Cinema.clear();game=Engine.create(game.mode,game.preset||"standard");persist();feedback="Начата новая игра.";render();});
 
 $("export-save").addEventListener("click",()=>{
  try{
@@ -319,7 +339,7 @@ $("import-file").addEventListener("change",async event=>{
   const imported=Engine.restore(raw);
   if(!imported){feedback="Файл не является совместимым сохранением HELIOS.";render();return;}
   if(!confirm("Заменить текущую партию загруженным сохранением?"))return;
-  game=imported;persist();feedback="Сохранение загружено. Прогресс восстановлен.";
+  Cinema.clear();game=imported;persist();feedback="Сохранение загружено. Прогресс восстановлен.";
  }catch{
   feedback="Файл не удалось прочитать.";
  }finally{
@@ -331,5 +351,6 @@ if(typeof navigator!=="undefined"&&"serviceWorker" in navigator&&location.protoc
  navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 
+Cinema.initialize({getGame:()=>game,act:change,engine:Engine});
 renderEcosystem();
 render();
