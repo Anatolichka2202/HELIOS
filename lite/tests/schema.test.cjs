@@ -92,3 +92,16 @@ test("acid front science unlock has a published, bounded engineering cost",()=>{
  assert.equal(x.wearMitigation,3);
  assert.equal(x.stormMitigation,4);
 });
+
+test("Venus 0.8 probe incident uses one documented economy contract",()=>{
+ const x=spec.liteExperimentalV08;
+ assert.deepEqual(E.CINEMATICS,x.cutscenes);
+ for(const id of ["recover","broadcast","salvage"]){
+   const actual=E.PROBE_STRATEGIES[id],expected=x.scienceSignal.choices[id];
+   assert.deepEqual(actual.cost,expected.cost);
+   assert.deepEqual(actual.gains,expected.gains);
+ }
+ assert.equal(x.scienceSignal.choices.recover.annualScienceBonus,2);
+ assert.equal(x.scienceSignal.choices.broadcast.treatyGrantBonus,12);
+ assert.equal(x.scienceSignal.existingSaveVersion,E.create().version);
+});
