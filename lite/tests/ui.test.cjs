@@ -277,7 +277,7 @@ test("players can skip a film and still choose a probe strategy in the mission U
  const incident=projects.find(node=>node.className?.includes("signal-investigation"));
  assert.ok(incident);
  assert.ok(incident.children.length>=6);
- incident.children[2].click(); // broadcast option
+ incident.children[3].click(); // broadcast option
  const saved=JSON.parse(app.store.get("helios-venus-v4"));
  assert.equal(saved.probeDiscovery,"broadcast");
  assert.equal(app.get("objective-title").textContent,"Создать орбитальную связь");
