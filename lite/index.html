@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1322">
 <title>HELIOS — Venus Initiative</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/helios-icon.svg" type="image/svg+xml"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="HELIOS Venus"><link rel="stylesheet" href="style.css"></head><body>
-<header><div class="brand"><span class="sun">◉</span><div><strong>HELIOS</strong><small>VENUS INITIATIVE · PLAYABLE V0.7.1</small></div></div><div class="head-actions"><button id="save" class="ghost">Сохранить</button><button id="export-save" class="ghost">Резервная копия</button><button id="import-save" class="ghost">Загрузить</button><input id="import-file" type="file" accept=".json,application/json" hidden><button id="reset" class="ghost">Новая игра</button></div></header>
+<header><div class="brand"><span class="sun">◉</span><div><strong>HELIOS</strong><small>VENUS INITIATIVE · PLAYABLE V0.8</small></div></div><div class="head-actions"><button id="cinema-replay" class="ghost cinema-entry">Сцены</button><button id="save" class="ghost">Сохранить</button><button id="export-save" class="ghost">Резервная копия</button><button id="import-save" class="ghost">Загрузить</button><input id="import-file" type="file" accept=".json,application/json" hidden><button id="reset" class="ghost">Новая игра</button></div></header>
 <main>
 <section class="hero">
 <div class="hero-content"><div class="kicker">ГЛАВА I / ЗАБЫТАЯ ПРОГРАММА</div><h1>Воскресить<br><em>Венеру</em></h1><p>СССР оставил закрытое досье. Молодой российский инженер считает, что у человечества есть шанс построить новый мир над облаками Венеры. Почти никто ему не верит.</p><div class="mode-buttons"><button id="campaign" class="primary">Кампания</button><button id="session">Свободная сессия</button></div><label class="preset-label" for="session-preset">Условия свободной сессии <select id="session-preset"><option value="standard">Стандарт</option><option value="constrained">Дефицит ресурсов</option><option value="funded">Крупный консорциум</option></select></label></div>
@@ -81,5 +81,30 @@
  <aside id="ecosystem-offers" class="ecosystem-offers" hidden aria-label="Поддержать новые истории HELIOS"></aside>
  <p class="ecosystem-fineprint">Никаких игровых преимуществ за реальные деньги. Неподтверждённые магазины и способы оплаты здесь не рекламируются.</p>
 </section>
-</main><footer>HELIOS · EARLY PLAYABLE SLICE · события и экономические значения демонстрационные · <a href="https://github.com/Anatolichka2202/HELIOS">GitHub</a></footer>
-<script src="engine.js"></script><script src="ecosystem.js"></script><script src="game.js"></script></body></html>
+</main>
+<section id="cinema" class="cinema" role="dialog" aria-modal="true" aria-labelledby="cinema-title" hidden>
+  <div id="cinema-stage" class="cinema-stage scene-prologue beat-archive">
+    <div class="cinema-visual" aria-hidden="true"></div>
+    <div class="cinema-grain" aria-hidden="true"></div>
+    <div class="cinema-telemetry" aria-hidden="true"><span>HELIOS / МИССИЯ ВЕНЕРА</span><span id="cinema-telemetry-value">СИГНАЛ / ОЖИДАНИЕ</span></div>
+    <div class="cinema-top"><span id="cinema-series">ГЛАВА I</span>
+      <div class="cinema-tools"><button id="cinema-sound" class="cinema-top-button" type="button" aria-pressed="false">Звук: выкл.</button>
+        <button id="cinema-skip" class="cinema-top-button" type="button">Пропустить</button></div>
+    </div>
+    <div class="cinema-bottom">
+      <div id="cinema-beat-label" class="cinema-eyebrow"></div>
+      <h2 id="cinema-title">Воскресить Венеру</h2>
+      <p id="cinema-copy"></p>
+      <div id="cinema-choices" class="cinema-choices"></div>
+      <div class="cinema-footer"><div id="cinema-progress" class="cinema-progress" aria-label="Прогресс сцены"></div>
+        <div class="cinema-controls">
+          <button id="cinema-back" class="cinema-outline" type="button">Назад</button>
+          <button id="cinema-next" class="cinema-forward" type="button">Дальше →</button>
+        </div>
+      </div>
+    </div>
+    <p class="cinema-legal">Художественная альтернативная история · события и параметры экспедиции условные</p>
+  </div>
+</section>
+<footer>HELIOS · EARLY PLAYABLE SLICE · события и экономические значения демонстрационные · <a href="https://github.com/Anatolichka2202/HELIOS">GitHub</a></footer>
+<script src="engine.js"></script><script src="ecosystem.js"></script><script src="scenes.js"></script><script src="game.js"></script></body></html>
