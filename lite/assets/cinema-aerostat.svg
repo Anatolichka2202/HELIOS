@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Огромная научная аэростатная станция над облаками Венеры">
+<defs><linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#122b43"/><stop offset=".55" stop-color="#a06b5e"/><stop offset="1" stop-color="#e2a56e"/></linearGradient><linearGradient id="cloud" x1="0" x2=".2" y1="0" y2="1"><stop stop-color="#f9d8a5"/><stop offset="1" stop-color="#b9685c"/></linearGradient><linearGradient id="hull" x1="0" x2=".9" y1="0" y2="1"><stop stop-color="#faf0c7"/><stop offset=".37" stop-color="#d6ad82"/><stop offset=".72" stop-color="#9c715f"/><stop offset="1" stop-color="#533e4a"/></linearGradient><linearGradient id="glass"><stop stop-color="#5fc6c1"/><stop offset=".45" stop-color="#285879"/><stop offset="1" stop-color="#89dcd0"/></linearGradient><radialGradient id="sun"><stop stop-color="#fff3c4"/><stop offset=".3" stop-color="#f9ce9e" stop-opacity=".35"/><stop offset="1" stop-color="#eca66b" stop-opacity="0"/></radialGradient></defs>
+<rect width="1200" height="675" fill="url(#sky)"/><circle cx="930" cy="156" r="320" fill="url(#sun)"/>
+<path d="M0 366Q230 282 480 381T1200 335V675H0Z" fill="#edb580" opacity=".28"/><path d="M0 513Q225 445 405 508T770 494T1200 475V675H0Z" fill="url(#cloud)"/><path d="M-50 590Q215 501 462 568T1250 536V675H-50Z" fill="#ffe5b4" opacity=".5"/><path d="M-25 632Q320 571 580 635T1200 614" fill="none" stroke="#fff0cf" stroke-opacity=".4" stroke-width="35"/>
+<g transform="translate(0 -28)">
+ <path d="M180 284Q231 83 559 75Q856 81 940 286Q925 365 840 390L280 390Q206 356 180 284Z" fill="url(#hull)" stroke="#ffe6bb" stroke-width="8"/>
+ <path d="M179 283Q548 352 944 283M314 147Q553 210 804 148M555 76Q469 199 515 395M555 76Q678 219 610 388" fill="none" stroke="#735f62" stroke-width="6" opacity=".6"/>
+ <path d="M290 392L349 482M819 392L758 482M558 386V492" stroke="#f1d1aa" stroke-width="9"/>
+ <path d="M348 480L769 480L744 541L372 541Z" fill="#243e54" stroke="#f6d2a2" stroke-width="7"/>
+ <path d="M376 491L740 491L724 524L386 524Z" fill="#2c5767"/>
+ <path d="M403 488H713V512H403Z" fill="url(#glass)"/>
+ <path d="M386 499H725" stroke="#e8dfbf" stroke-width="4"/>
+ <path d="M426 486V532M480 484V534M535 482V538M590 482V538M645 482V534M700 482V532" stroke="#c9aa8d" stroke-width="4"/>
+ <rect x="477" y="541" width="165" height="32" rx="10" fill="#465768" stroke="#e9c9a7" stroke-width="5"/>
+ <path d="M558 573L558 596M480 598H640" stroke="#d9bb9c" stroke-width="6"/>
+ <path d="M442 537L421 558M674 537L694 558" stroke="#f3d2a4" stroke-width="7"/>
+ <path d="M276 370L162 403L150 425L311 403M845 370L958 404L971 425L812 405" fill="#294f63" stroke="#d0b391" stroke-width="6"/>
+ <path d="M183 395L154 416L281 399M931 396L969 419L838 399" stroke="#76a9a4" stroke-width="6"/>
+</g>
+<g opacity=".6"><path d="M60 312Q93 273 125 301T191 284" fill="none" stroke="#fbdeaa" stroke-width="5"/><circle cx="68" cy="308" r="8" fill="#ffe6b2"/></g>
+<g transform="translate(1020 350) scale(.36)" opacity=".7"><ellipse cx="0" cy="0" rx="178" ry="78" fill="#dac49e"/><path d="M-70 65L-40 135H50L70 65" stroke="#b3c2bb" stroke-width="15" fill="#30495a"/></g>
+</svg>
