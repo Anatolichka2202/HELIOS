@@ -25,7 +25,7 @@ These are **product specifications, not claims of implemented features**. See th
 
 | Directory | Purpose | Current status |
 |---|---|---|
-| [lite/](lite/) | Browser Venus Initiative | Venus 0.7 source, production/tradeoff loop, PWA/cache, backup saves; real iPhone test pending |
+| [lite/](lite/) | Browser Venus Initiative | Venus 0.8 playable illustrated story beats + lost-probe decision, PWA/cache, backup saves; real iPhone UX still needs testing |
 | [pc/](pc/) | Unreal Engine 5 / C++ flagship | UE mission subsystem, keyboard prototype, 3D scene + in-world console; build unverified |
 | [mobile/](mobile/) | Unity / C# for Android/iOS | Venus scene preview and mission catalog; device builds unverified |
 | [core/](core/) | C++ simulation research prototype | CMake and smoke test |
@@ -62,6 +62,14 @@ See [Venus campaign](design/VENUS_CAMPAIGN.md), [Venus acceptance criteria](desi
 
 ## Venus 0.7 gameplay update
 
-The browser prototype now includes two distinct aerostat engineering designs, staggered commissioning of major facilities, a consequential acid-front crisis, unlockable corrosion-resistant materials, energy/supply-dependent mission viability and different campaign epilogues. The Lite simulation and schema/UI smoke suite contains **61 tests** that passed in a controlled JS harness. These are **not measured retention metrics** or verified native mobile/PC builds.
+The browser prototype now includes two distinct aerostat engineering designs, staggered commissioning of major facilities, a consequential acid-front crisis, unlockable corrosion-resistant materials, energy/supply-dependent mission viability and different campaign epilogues. The Lite simulation and schema/UI smoke suite contains **78 tests** that passed in a controlled JS harness. These are **not measured retention metrics** or verified native mobile/PC builds.
 
 [Playtest on phone and report whether it's actually fun](docs/PLAYTEST_VENUS_0_7.md). The prior `mobile/` Unity and `pc/` Unreal sources remain a separate, older vertical slice and are not yet at Lite 0.7 rules parity.
+
+## Venus 0.8 interactive story update
+
+**[Playtest 0.8](docs/PLAYTEST_VENUS_0_8.md)** · [Game](https://anatolichka2202.github.io/HELIOS/)
+
+An illustrated in-game cinematic sequence now follows the archive, atmospheric probe, first aerostat, acid front and first ending. On probe radio loss, players can recover scientific data, publish telemetry or salvage equipment; each choice affects actual budget/research/supplies and future science/treaty funding. Cinematics are skippable and replayable with no additional resource changes.
+
+The [GitHub Prototype checks](.github/workflows/check.yml) passed **78/78 Lite tests** on 28 October 2026, and Pages deployment completed successfully. This is still a **small experimental campaign**, not the previously targeted 20–30 minute polished narrative game. Manual touch performance and browser audio on actual iPhone/Android devices have not yet been established.
