@@ -1,6 +1,6 @@
 {
   "name": "helios-venus-lite",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": true,
   "description": "HELIOS Venus campaign and session prototype",
   "scripts": {
