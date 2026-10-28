@@ -7,7 +7,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const code = ["engine.js", "ecosystem.js", "game.js"].map(name => fs.readFileSync(path.join(root, name), "utf8"));
+const code = ["engine.js", "ecosystem.js", "scenes.js", "cinema.js", "game.js"].map(name => fs.readFileSync(path.join(root, name), "utf8"));
 const expectedIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
 class Element {
   constructor(tag="div") {
@@ -39,6 +39,8 @@ function mount(store=new Map(),allowedStorage=true){
  vm.runInContext(code[0],sandbox);
  vm.runInContext(code[1],sandbox);
  vm.runInContext(code[2],sandbox);
+ vm.runInContext(code[3],sandbox);
+ vm.runInContext(code[4],sandbox);
  return {nodes,store,sandbox,get:id=>document.getElementById(id)};
 }
 test("game loads with four Venus zones and campaign story",()=>{
@@ -219,4 +221,77 @@ test("browser holds independent campaign state when ecosystem display is rendere
  app.get("next").click();
  assert.equal(app.get("year").textContent,2035);
  assert.equal(app.get("ecosystem-products").children.length,3);
+});
+
+test("Venus 0.8 opens a captioned classified-file cinematic and can begin council",()=>{
+ const app=mount();
+ assert.equal(app.get("cinema").hidden,false);
+ assert.ok(app.get("cinema-title").textContent.includes("другое имя"));
+ assert.equal(app.get("cinema-next").disabled,false);
+ app.get("cinema-next").click();
+ assert.ok(app.get("cinema-title").textContent.includes("невозможное"));
+ app.get("cinema-next").click();
+ assert.ok(app.get("cinema-title").textContent.includes("Венера"));
+ app.get("cinema-next").click();
+ const state=JSON.parse(app.store.get("helios-venus-v4"));
+ assert.equal(state.storyStep,1);
+ assert.deepEqual(Array.from(state.cinematicSeen),["prologue"]);
+ assert.equal(app.get("cinema").hidden,true);
+});
+
+test("probe signal-loss film leads to a meaningful saved engineering decision",()=>{
+ const app=mount();
+ app.get("cinema-skip").click(); // archive prologue is optional
+ app.get("story-actions").children[0].click(); // council
+ app.get("story-actions").children[0].click(); // public funding
+ app.get("projects").children[0].children.at(-1).click(); // archive
+ app.get("layers").children[1].click(); // clouds
+ app.get("projects").children[0].children.at(-1).click(); // probe
+ assert.equal(app.get("cinema").hidden,false);
+ assert.ok(app.get("cinema-title").textContent.includes("облака"));
+ app.get("cinema-next").click(); // blackout
+ assert.ok(app.get("cinema-telemetry-value").textContent.includes("ПОТЕРЯН"));
+ app.get("cinema-next").click(); // decision
+ assert.equal(app.get("cinema-next").hidden,true);
+ assert.equal(app.get("cinema-choices").children.length,3);
+ app.get("cinema-choices").children[0].click(); // recover
+ const saved=JSON.parse(app.store.get("helios-venus-v4"));
+ assert.equal(saved.probeDiscovery,"recover");
+ assert.equal(saved.cinematicSeen.includes("probe"),true);
+ assert.equal(app.get("cinema").hidden,true);
+ const reloaded=mount(app.store);
+ assert.equal(JSON.parse(reloaded.store.get("helios-venus-v4")).probeDiscovery,"recover");
+ assert.equal(reloaded.get("cinema").hidden,true);
+});
+
+test("players can skip a film and still choose a probe strategy in the mission UI",()=>{
+ const app=mount();
+ app.get("cinema-skip").click();
+ app.get("session").click();
+ app.get("projects").children[0].children.at(-1).click(); // archive
+ app.get("layers").children[1].click(); // clouds
+ app.get("projects").children[0].children.at(-1).click(); // probe
+ app.get("cinema-skip").click();
+ assert.equal(app.get("cinema").hidden,true);
+ const projects=app.get("projects").children;
+ const incident=projects.find(node=>node.className?.includes("signal-investigation"));
+ assert.ok(incident);
+ assert.ok(incident.children.length>=6);
+ incident.children[2].click(); // broadcast option
+ const saved=JSON.parse(app.store.get("helios-venus-v4"));
+ assert.equal(saved.probeDiscovery,"broadcast");
+ assert.equal(app.get("objective-title").textContent,"Создать орбитальную связь");
+});
+
+test("replaying cinematics never changes research budget or construction progress",()=>{
+ const app=mount();
+ app.get("cinema-skip").click();
+ const first=JSON.parse(app.store.get("helios-venus-v4"));
+ app.get("cinema-replay").click();
+ assert.equal(app.get("cinema").hidden,false);
+ app.get("cinema-skip").click();
+ const after=JSON.parse(app.store.get("helios-venus-v4"));
+ assert.equal(after.credits,first.credits);
+ assert.equal(after.science,first.science);
+ assert.deepEqual(after.completed,first.completed);
 });
