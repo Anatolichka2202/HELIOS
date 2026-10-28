@@ -34,6 +34,17 @@ const DESIGNS=Object.freeze({
   description:"Конструкция из старого сохранения. Модель оставлена для совместимости."}
 });
 const SCHEDULED=Object.freeze({aerostat:1,lab:1});
+// Venus 0.8: optional scientific response to a real probe signal loss.
+// Different choices change engineering resources and later project economics.
+const PROBE_STRATEGIES=Object.freeze({
+ recover:{id:"recover",name:"Искать сигнал",cost:{credits:8,energy:4},
+   gains:{science:18},description:"Дорогая глубокая телеметрия. Новые данные дают +2 науки каждый будущий период."},
+ broadcast:{id:"broadcast",name:"Открыть телеметрию",cost:{},
+   gains:{science:9},description:"Публикация данных усилит международную поддержку: +12 бюджета при подписании договора."},
+ salvage:{id:"salvage",name:"Спасти аппарат",cost:{science:3},
+   gains:{supplies:8},description:"Прерываем эксперимент, возвращаем ценные расходники. Новых данных меньше."}
+});
+const CINEMATICS=Object.freeze(["prologue","probe","aerostat","front","ending"]);
 const SESSION_PRESETS=Object.freeze({
  standard:{name:"Стандарт",credits:170,science:36,energy:25,supplies:32,description:"Сбалансированная первая экспедиция."},
  constrained:{name:"Дефицит",credits:120,science:26,energy:20,supplies:20,description:"Поставки и финансирование особенно важны."},
@@ -47,11 +58,11 @@ function create(mode="campaign",preset="standard"){
   credits:mode==="session"?starting.credits:125,science:mode==="session"?starting.science:20,
   energy:mode==="session"?starting.energy:25,supplies:mode==="session"?starting.supplies:32,
   selected:"orbit",completed:[],shipments:[],condition:0,consecutiveYears:0,international:false,
-  storyStep:0,funding:null,criticalYears:0,outcome:null,policy:"standard",design:null,buildQueue:[],event:null,eventResolved:false,insight:null,prototype:false,lastTurn:null,finished:false,
+  storyStep:0,funding:null,criticalYears:0,outcome:null,policy:"standard",design:null,buildQueue:[],event:null,eventResolved:false,insight:null,prototype:false,probeDiscovery:null,cinematicSeen:[],lastTurn:null,finished:false,
   log:["2034 · В России обнаружен архив закрытой венерианской программы."]};
 }
 function copy(s){return {...s,completed:[...s.completed],shipments:s.shipments.map(x=>({...x})),
- buildQueue:(s.buildQueue||[]).map(x=>({...x})),log:[...s.log],lastTurn:s.lastTurn?{...s.lastTurn}:null};}
+ buildQueue:(s.buildQueue||[]).map(x=>({...x})),cinematicSeen:[...(s.cinematicSeen||[])],log:[...s.log],lastTurn:s.lastTurn?{...s.lastTurn}:null};}
 function has(s,id){return s.completed.includes(id);}
 function addLog(s,text){s.log.unshift(s.year+" · "+text);s.log=s.log.slice(0,25);}
 function projectCost(s,id){
@@ -69,9 +80,25 @@ function canBuild(s,id){
  return p.requires.every(r=>has(s,r))&&Object.entries(cost).every(([k,v])=>s[k]>=v);
 }
 function apply(s,command){const n=copy(s);if(n.version!==4)return {state:s,error:"Несовместимая версия сохранения."};
-if(n.finished&&command.type!=="select")return {state:s,error:"Сессия завершена. Можно начать новую игру."};
+if(n.finished&&command.type!=="select"&&command.type!=="cinema")return {state:s,error:"Сессия завершена. Можно начать новую игру."};
 switch(command.type){
 case "select":if(!ZONES.some(z=>z.id===command.id))return {state:s,error:"Неизвестная зона."};n.selected=command.id;break;
+case "cinema":
+ if(!CINEMATICS.includes(command.id))return {state:s,error:"Неизвестная сцена."};
+ if(!n.cinematicSeen.includes(command.id))n.cinematicSeen.push(command.id);
+ break;
+case "probe-response":{
+ const choice=PROBE_STRATEGIES[command.id];
+ if(!choice||!has(n,"probe")||n.probeDiscovery!==null)
+  return {state:s,error:"Телеметрия уже обработана или зонд ещё не запущен."};
+ if(Object.entries(choice.cost).some(([key,value])=>n[key]<value))
+  return {state:s,error:"Для выбранного плана восстановления сигнала недостаточно ресурсов."};
+ for(const [key,value] of Object.entries(choice.cost))n[key]-=value;
+ for(const [key,value] of Object.entries(choice.gains))n[key]+=value;
+ n.probeDiscovery=choice.id;
+ addLog(n,"Телеметрия зонда: "+choice.name+". "+choice.description);
+ break;
+}
 case "build":{
  const p=PROJECT_BY_ID[command.id];
  if(!canBuild(n,command.id))return {state:s,error:"Недоступный проект, очередь строительства или недостаточно ресурсов."};
@@ -133,7 +160,7 @@ case "funding":{
 case "treaty":{
  if(n.mode!=="campaign"||n.storyStep!==1||n.funding===null||!has(n,"probe")||!has(n,"relay"))return {state:s,error:"Нужны источник финансирования, зонд и ретранслятор."};
  n.storyStep=2;n.international=true;
- const grant=n.funding==="public"?65:45, supplies=n.funding==="public"?20:8;
+ const grant=(n.funding==="public"?65:45)+(n.probeDiscovery==="broadcast"?12:0), supplies=n.funding==="public"?20:8;
  n.credits+=grant;n.supplies+=supplies;
  addLog(n,"Открыта международная программа. Грант: +"+grant+" бюджета, +"+supplies+" снабжения.");
  break;
@@ -152,7 +179,7 @@ case "next":{
  const oldCredits=n.credits,oldScience=n.science,oldEnergy=n.energy,oldSupplies=n.supplies;
  n.turn++;n.year++;
  const income=13+(n.international?9:0)-(n.funding==="private"&&hadLab?6:0);
- n.credits+=income;n.science+=3+(has(n,"probe")?2:0)+(n.funding==="public"&&hadLab?3:0);n.energy+=3;
+ n.credits+=income;n.science+=3+(has(n,"probe")?2:0)+(n.probeDiscovery==="recover"?2:0)+(n.funding==="public"&&hadLab?3:0);n.energy+=3;
  if(n.funding==="private"&&hadLab)addLog(n,"Инвесторам выплачено 6 бюджета за лицензионный доступ.");
  if(n.funding==="public"&&hadLab)addLog(n,"Открытый научный обмен: +3 науки.");
  const arriving=n.shipments.filter(x=>x.arrival<=n.turn);n.shipments=n.shipments.filter(x=>x.arrival>n.turn);for(const load of arriving){n.supplies+=load.amount;addLog(n,"Земной груз доставлен: +"+load.amount+" снабжения.");}
@@ -208,8 +235,14 @@ function restore(json){try{const s=JSON.parse(json);if(!s||s.version!==4||!["cam
  if(s.eventResolved===undefined)s.eventResolved=false;
  if(s.insight===undefined)s.insight=null;
  if(s.prototype===undefined)s.prototype=false;
+ if(s.probeDiscovery===undefined)s.probeDiscovery=null;
+ if(s.cinematicSeen===undefined)s.cinematicSeen=[];
  if(!Array.isArray(s.buildQueue)||s.buildQueue.some(q=>!SCHEDULED[q.id]||
     !Number.isInteger(q.ready)||q.ready<s.turn||s.completed.includes(q.id)))return null;
+ if(![null,...Object.keys(PROBE_STRATEGIES)].includes(s.probeDiscovery)||
+    !Array.isArray(s.cinematicSeen)||s.cinematicSeen.length>5||
+    new Set(s.cinematicSeen).size!==s.cinematicSeen.length||
+    s.cinematicSeen.some(id=>!CINEMATICS.includes(id)))return null;
  if(typeof s.prototype!=="boolean"||![null,"shield","light","legacy"].includes(s.design)||
     ![null,"acid-front"].includes(s.event)||
     ![null,"sample","protect","retreat"].includes(s.insight))return null;
@@ -225,7 +258,7 @@ function forecast(s){
  return {
  nextYear:s.year+1,
  credits:13+(s.international?9:0)-(s.funding==="private"&&lab?6:0),
- science:3+(has(s,"probe")?2:0)+(s.funding==="public"&&lab?3:0)+
+ science:3+(has(s,"probe")?2:0)+(s.probeDiscovery==="recover"?2:0)+(s.funding==="public"&&lab?3:0)+
   (lab&&stocked&&s.condition>=40?Math.max(1,(policy||POLICIES.standard).science+(DESIGNS[s.design]?.science||0)):0),
  energy:3-(active&&stocked?power:0),
  supplies:arriving-(active&&stocked?cost:0),
@@ -272,5 +305,5 @@ function score(s){
    -Math.max(0,s.turn-1)*8
  ));
 }
-return {ZONES,PROJECTS,POLICIES,DESIGNS,SESSION_PRESETS,create,apply,has,canBuild,projectCost,restore,forecast,score,ending};
+return {ZONES,PROJECTS,POLICIES,DESIGNS,PROBE_STRATEGIES,CINEMATICS,SESSION_PRESETS,create,apply,has,canBuild,projectCost,restore,forecast,score,ending};
 });
