@@ -3,7 +3,8 @@
 const CACHE="helios-venus-shell-v0.8.0";
 const ASSETS=[
  "./","./index.html","./style.css","./engine.js","./ecosystem.js","./scenes.js","./cinema.js","./game.js",
- "./manifest.webmanifest","./assets/helios-icon.svg","./assets/venus-clouds.svg"
+ "./manifest.webmanifest","./assets/helios-icon.svg","./assets/venus-clouds.svg",
+ "./assets/cinema-archive.svg","./assets/cinema-probe.svg","./assets/cinema-aerostat.svg"
 ];
 self.addEventListener("install",event=>{
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
