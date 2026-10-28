@@ -220,7 +220,7 @@ function drawOperations(){
  $("visual-lab").classList.toggle("active",Engine.has(game,"lab"));
  $("visual-lab").classList.toggle("building",(game.buildQueue||[]).some(q=>q.id==="lab"));
  let stage="ПОДГОТОВКА",caption="Сначала восстановите архив, затем отправьте атмосферный зонд.";
- if(Engine.has(game,"probe")){stage="ИССЛЕДОВАНИЯ";caption=game.probeDiscovery?"Решение по телеметрии: "+Engine.PROBE_STRATEGIES[game.probeDiscovery].name+".":"Телеметрия прервана. Нужно принять научное решение.";}
+ if(Engine.has(game,"probe")){stage="ИССЛЕДОВАНИЯ";caption=game.probeDiscovery?"Решение по телеметрии: "+Engine.PROBE_STRATEGIES[game.probeDiscovery].name+".":"Зонд потерял связь. Нужно принять научное решение.";}
  if(Engine.has(game,"aerostat")){stage="АЭРОСТАТ";caption="Первый аппарат закрепился в облачном слое. Следите за состоянием и снабжением.";}
  if(Engine.has(game,"lab")){stage="ЛАБОРАТОРИЯ";caption="Исследовательская станция действует: "+game.consecutiveYears+"/3 устойчивых лет.";}
  if((game.buildQueue||[]).some(q=>q.id==="aerostat")){stage="МОНТАЖ";caption="Инженеры собирают "+Engine.DESIGNS[game.design].name.toLowerCase()+". Ввод после следующего периода.";}
