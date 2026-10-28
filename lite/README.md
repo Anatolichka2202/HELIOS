@@ -1,4 +1,4 @@
-# HELIOS Lite — Venus Initiative (0.7.1)
+# HELIOS Lite — Venus Initiative (0.8.0)
 
 The first playable vertical slice is **Venus**. The planned franchise remains Solar System-wide.
 
@@ -25,13 +25,13 @@ Open http://localhost:8080. No backend or bundler required.
 ## Publish for iPhone
 
 [Pages deployment workflow](../.github/workflows/pages.yml) packages the game runtime, its franchise configuration, styles, PWA files and assets.
-The repo currently also supports **Settings → Pages → Source: Deploy from a branch → main → /(root)**, using the top-level redirect to `/lite/index.html`. Do **not** use both deployment configurations simultaneously. Deployment was first confirmed via GitHub Pages; after each update check Actions and reload the published URL.
+The repo publishes using **Settings → Pages → Source: Deploy from a branch → main → /(root)**, using the top-level redirect to `/lite/index.html`. Do **not** use both deployment configurations simultaneously. Deployment was first confirmed via GitHub Pages; after each update check Actions and reload the published URL.
 
 ## Limitations
 
 - Economic units and atmospheric events are illustrative, not realistic scientific modeling.
 - No device-level iPhone verification, polished UI/UX or accessibility audit yet.
-- No real cutscenes, voice acting, multilayer 3D or multiplayer.
+- 0.8 adds original SVG cinematic story beats and optional synthesised interface sounds. No filmed/3D cutscenes, voice acting, original score, or multiplayer yet.
 - Game state is local to the browser, not cloud-synced.
 
 See [Venus vertical slice](../design/VENUS_VERTICAL_SLICE.md), [campaign](../design/VENUS_CAMPAIGN.md), and [shared scenario contract](../shared/venus-scenario.json).
@@ -90,3 +90,17 @@ python3 ../tools/verify_web_assets.py
 ```
 
 The simulation and UI suite (including safe storefront checks) had **66 passing checks in a controlled JS harness** at the time of the v0.4 product-strategy update. This does not certify a real purchase, runtime FPS or native client build.
+
+## New in 0.8 — first interactive cinematic story slice
+
+- Story chapters are staged fullscreen over **original source-controlled SVG key art**: Soviet/Russian archive premise, science council, Venus probe plunge and radio blackout, first working aerostat, acid-front crisis and mission epilogue. These are illustrated game cinematics, **not generated footage or full 3D**.
+- Responsive cinematic layout, shot sequencing, subtitles, ability to skip or replay in the **Сцены** menu, optional opt-in synthesis of short sounds, and support for reduced-motion accessibility settings.
+- A probe signal incident offers **three real choices**:
+  - deep recovery: −8 budget, −4 energy, +18 science now, +2 science in subsequent turns;
+  - publish open telemetry: +9 science now and +12 funding on international treaty;
+  - salvage the spacecraft: −3 science, +8 supplies now.
+- The signal decision also works through the normal cloud-project UI if the cinematic is skipped. Cutscene playback does **not** change resources by itself.
+- Browser save `version:4` remains backward compatible; `probeDiscovery` and `cinematicSeen` are optional when restoring old saves.
+- Two new runtime modules: `scenes.js` (script and conditions) and `cinema.js` (presentation and keyboard controls). Added 3 original art files in `assets/cinema-*.svg`.
+- `shared/venus-scenario.json` now documents the optional `liteExperimentalV08` extension, explicitly **not yet native-client parity**.
+- See [0.8 playtest guide](../docs/PLAYTEST_VENUS_0_8.md). CI verified **78/78 Lite JS tests** and referenced SVG assets; true iPhone/Android usability still requires manual device testing.
