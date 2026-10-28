@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Атмосферный зонд над золотистыми облаками Венеры">
+<defs><radialGradient id="sky"><stop stop-color="#f8bc6b"/><stop offset=".52" stop-color="#9e6042"/><stop offset="1" stop-color="#231e36"/></radialGradient><linearGradient id="vapor" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#fff0bb" stop-opacity=".32"/><stop offset="1" stop-color="#6d3641" stop-opacity=".28"/></linearGradient><linearGradient id="steel" x1="0" x2="1" y1="0" y2=".9"><stop stop-color="#e6efed"/><stop offset=".33" stop-color="#7798a5"/><stop offset=".75" stop-color="#27394a"/><stop offset="1" stop-color="#f5c999"/></linearGradient><radialGradient id="flash"><stop stop-color="#fdf5ce" stop-opacity=".88"/><stop offset=".4" stop-color="#f7ba70" stop-opacity=".25"/><stop offset="1" stop-color="#faac69" stop-opacity="0"/></radialGradient></defs>
+<rect width="1200" height="675" fill="url(#sky)"/><ellipse cx="260" cy="55" rx="565" ry="300" fill="url(#flash)"/>
+<g fill="url(#vapor)" opacity=".75"><path d="M-50 180Q220 35 520 157T1260 104V310Q970 320 755 264T160 342H-50Z"/><path d="M-100 344Q240 220 560 335T1300 280V490Q1040 435 740 465T-100 520Z"/></g>
+<g fill="#f0b777" opacity=".25"><ellipse cx="130" cy="500" rx="490" ry="80"/><ellipse cx="850" cy="515" rx="630" ry="115"/><ellipse cx="455" cy="625" rx="620" ry="110"/></g>
+<g fill="none" stroke-linecap="round"><path d="M1040 -60L445 585" stroke="#ffe6a0" stroke-opacity=".58" stroke-width="18"/><path d="M1000 -110L390 540" stroke="#f6e2b7" stroke-opacity=".33" stroke-width="7"/><path d="M1122 -5L520 615" stroke="#ffbe87" stroke-opacity=".6" stroke-width="7"/><path d="M1170 110L560 675" stroke="#ffdb97" stroke-opacity=".3" stroke-width="12"/></g>
+<g transform="translate(614 342) rotate(42)">
+ <ellipse cx="0" cy="128" rx="145" ry="295" fill="url(#flash)" opacity=".7"/>
+ <path d="M0 -195Q82 -156 95 -44L79 137L0 194L-79 137L-95 -44Q-81 -155 0 -195Z" fill="url(#steel)" stroke="#e5e2be" stroke-width="6"/>
+ <path d="M0 -184V184M-90 -28H90M-81 79H81" stroke="#d5b890" stroke-opacity=".6" stroke-width="4"/>
+ <path d="M-87 3L-194 70L-211 115L-82 107M87 3L194 70L211 115L82 107" fill="#2c4860" stroke="#d4ad85" stroke-width="7"/>
+ <path d="M-198 66L-198 113M198 66L198 113" stroke="#a5d7cf" stroke-width="12"/>
+ <ellipse cx="0" cy="-50" rx="45" ry="68" fill="#163444" stroke="#95d2cb" stroke-width="7"/><ellipse cx="-12" cy="-69" rx="18" ry="25" fill="#8ed2cc" opacity=".48"/>
+ <path d="M-43 176L-58 247L0 305L58 247L43 176" fill="#8a4850" stroke="#f8c48b" stroke-width="7"/>
+ <path d="M-31 277L0 377L31 277Z" fill="#fff1ca" opacity=".82"/>
+ <path d="M-73 134L-94 182M73 134L94 182" stroke="#f2c68d" stroke-width="8"/>
+</g>
+<path d="M-80 596Q201 468 425 551T930 533T1280 565V675H-80Z" fill="#e9aa70" opacity=".36"/>
+<path d="M-40 646Q240 560 532 623T1270 598" fill="none" stroke="#ffe2ad" stroke-width="24" opacity=".3"/>
+</svg>
