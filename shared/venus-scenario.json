@@ -288,5 +288,57 @@
     },
     "privateAnnualRoyalties": 6,
     "publicAnnualScienceBonus": 3
+  },
+  "liteExperimentalV08": {
+    "status": "Playable Lite narrative and optional probe-signal strategy; not implemented in Unity/Unreal native clients.",
+    "cutscenes": [
+      "prologue",
+      "probe",
+      "aerostat",
+      "front",
+      "ending"
+    ],
+    "scienceSignal": {
+      "trigger": "Atmospheric probe commissioning; cinematics optional but gameplay decision remains available.",
+      "mandatory": false,
+      "choices": {
+        "recover": {
+          "cost": {
+            "credits": 8,
+            "energy": 4
+          },
+          "gains": {
+            "science": 18
+          },
+          "annualScienceBonus": 2
+        },
+        "broadcast": {
+          "cost": {},
+          "gains": {
+            "science": 9
+          },
+          "treatyGrantBonus": 12
+        },
+        "salvage": {
+          "cost": {
+            "science": 3
+          },
+          "gains": {
+            "supplies": 8
+          }
+        }
+      },
+      "default": null,
+      "saveField": "probeDiscovery",
+      "cinematicSaveField": "cinematicSeen",
+      "existingSaveVersion": 4,
+      "note": "No signal choice preserves the 0.7 resource economy. Skipping/replaying scenes does not alter resources."
+    },
+    "art": [
+      "assets/cinema-archive.svg",
+      "assets/cinema-probe.svg",
+      "assets/cinema-aerostat.svg"
+    ],
+    "contentNote": "Fictional USSR archive, fictional scientific events; design values and atmospheric time are abstract."
   }
 }
