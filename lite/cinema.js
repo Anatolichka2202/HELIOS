@@ -120,6 +120,7 @@
  function initialize(options){
   if(bindings)return;
   bindings=options;
+  byId("cinema").hidden=true;
   byId("cinema-replay").addEventListener("click",replay);
   byId("cinema-next").addEventListener("click",advance);
   byId("cinema-skip").addEventListener("click",close);
