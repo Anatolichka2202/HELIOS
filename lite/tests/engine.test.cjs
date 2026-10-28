@@ -275,3 +275,63 @@ test("station cannot claim stable laboratory years without real supplies or powe
  assert.equal(result.state.lastTurn.operating,false);
  assert.equal(E.forecast(s).shortage,true);
 });
+
+test("Venus 0.8 probe strategies have real, different and irreversible consequences",()=>{
+ let base=E.create("session");
+ base=move(base,"build","archive").state;
+ base=move(base,"build","probe").state;
+ const recover=move(base,"probe-response","recover");
+ const broadcast=move(base,"probe-response","broadcast");
+ const salvage=move(base,"probe-response","salvage");
+ for(const result of [recover,broadcast,salvage])assert.equal(result.error,null);
+ assert.equal(recover.state.credits,base.credits-8);
+ assert.equal(recover.state.energy,base.energy-4);
+ assert.equal(recover.state.science,base.science+18);
+ assert.equal(broadcast.state.science,base.science+9);
+ assert.equal(salvage.state.science,base.science-3);
+ assert.equal(salvage.state.supplies,base.supplies+8);
+ assert.ok(move(recover.state,"probe-response","salvage").error);
+ assert.equal(base.probeDiscovery,null);
+ assert.equal(E.forecast(recover.state).science-E.forecast(base).science,2);
+});
+test("open Venus telemetry gives an actual treaty bonus while old campaigns keep baseline",()=>{
+ let base=E.create();
+ for(const [type,id] of [["council"],["funding","public"],["build","archive"],["build","probe"],["build","relay"]]){
+  const result=move(base,type,id);
+  assert.equal(result.error,null);
+  base=result.state;
+ }
+ const original=move(base,"treaty");
+ const openData=move(base,"probe-response","broadcast");
+ const newTreaty=move(openData.state,"treaty");
+ assert.equal(original.error,null);
+ assert.equal(newTreaty.error,null);
+ assert.equal(newTreaty.state.credits-original.state.credits,12);
+ assert.equal(newTreaty.state.science-original.state.science,9);
+});
+test("probe decision validates affordability and keeps old campaign saves",()=>{
+ let base=E.create("session");
+ base=move(base,"build","archive").state;
+ base=move(base,"build","probe").state;
+ const exhausted={...base,credits:0,energy:0};
+ const rejected=move(exhausted,"probe-response","recover");
+ assert.ok(rejected.error);
+ assert.equal(rejected.state,exhausted);
+ const old={...base};delete old.probeDiscovery;delete old.cinematicSeen;
+ const reloaded=E.restore(JSON.stringify(old));
+ assert.equal(reloaded.probeDiscovery,null);
+ assert.deepEqual(reloaded.cinematicSeen,[]);
+ assert.deepEqual(E.restore(JSON.stringify(reloaded)),reloaded);
+});
+test("cinematic replay records progress without changing game physics, including a completed game",()=>{
+ const initial=E.create();
+ const watched=move(initial,"cinema","prologue");
+ assert.equal(watched.error,null);
+ assert.deepEqual(watched.state.cinematicSeen,["prologue"]);
+ assert.equal(watched.state.credits,initial.credits);
+ assert.notEqual(watched.state.cinematicSeen,initial.cinematicSeen);
+ assert.ok(move(initial,"cinema","unknown").error);
+ const done={...watched.state,finished:true,outcome:"victory"};
+ assert.equal(move(done,"cinema","ending").state.cinematicSeen.includes("ending"),true);
+ assert.equal(move(done,"cinema","ending").state.cinematicSeen.length,2);
+});
